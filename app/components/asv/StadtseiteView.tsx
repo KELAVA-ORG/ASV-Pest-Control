@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import AsvHero from './AsvHero'
 import AsvTrustBar from './AsvTrustBar'
 import AsvCtaBanner from './AsvCtaBanner'
@@ -38,6 +39,15 @@ interface Props {
   city: Stadtseite
   settings?: GlobalSettings | null
 }
+
+const PEST_LINKS = [
+  { title: 'Ratten & Mäuse', href: '/schaedlinge/ratten' },
+  { title: 'Wespen & Hornissen', href: '/schaedlinge/wespen' },
+  { title: 'Schaben & Kakerlaken', href: '/schaedlinge/schaben' },
+  { title: 'Bettwanzen', href: '/schaedlinge/bettwanzen' },
+  { title: 'Ameisen', href: '/schaedlinge/ameisen' },
+  { title: 'Taubenabwehr', href: '/schaedlinge/taubenabwehr' },
+]
 
 export default function StadtseiteView({ city, settings }: Props) {
   const phone = city.phoneFormatted || settings?.phoneMainFormatted || settings?.phoneMain
@@ -87,12 +97,16 @@ export default function StadtseiteView({ city, settings }: Props) {
 
       {/* Hero */}
       <AsvHero
-        badge={`Ihr Kammerjäger in ${city.cityName}`}
         title={`Schädlingsbekämpfung ${city.cityShort} – Schnell & Diskret`}
-        subtitle={city.heroSubtitle}
+        subtitle={city.heroSubtitle || `Ihr Kammerjäger in ${city.cityName} – schnell, diskret, IHK-zertifiziert.`}
         phoneFormatted={phone}
         phoneTel={phoneTel}
         ctaText="Kostenlose Beratung anfordern"
+        breadcrumbs={[
+          { label: 'Startseite', href: '/' },
+          { label: 'Standorte', href: '/standorte' },
+          { label: city.cityName },
+        ]}
       />
 
       {/* Trust Bar */}
@@ -100,20 +114,20 @@ export default function StadtseiteView({ city, settings }: Props) {
 
       {/* Stadt-Beschreibung + Einsatzgebiet */}
       {(city.cityDescription || (city.districts && city.districts.length > 0)) && (
-        <section className="asv-section">
-          <div className="asv-container">
-            <div className="asv-split reveal">
-              <div className="asv-split__content">
+        <section className="section">
+          <div className="container">
+            <div className="split" data-animate="fade-up">
+              <div className="split__content">
                 <h2>Schädlingsbekämpfung in {city.cityName}</h2>
-                {city.cityDescription && <p style={{ marginBottom: '1.5rem' }}>{city.cityDescription}</p>}
-                {city.einsatzgebietDesc && <p className="asv-text-muted">{city.einsatzgebietDesc}</p>}
+                {city.cityDescription && <p style={{ marginBottom: '1.5rem', color: 'var(--gray-600)' }}>{city.cityDescription}</p>}
+                {city.einsatzgebietDesc && <p style={{ color: 'var(--gray-400)' }}>{city.einsatzgebietDesc}</p>}
               </div>
               {city.districts && city.districts.length > 0 && (
-                <div className="asv-split__content">
+                <div className="split__content">
                   <h3>Wir sind vor Ort in:</h3>
-                  <div className="asv-tags">
+                  <div className="region__cities" style={{ marginTop: '1rem' }}>
                     {city.districts.map((d, i) => (
-                      <span key={i} className="asv-tag">{d}</span>
+                      <span key={i} className="region__city">{d}</span>
                     ))}
                   </div>
                 </div>
@@ -124,22 +138,18 @@ export default function StadtseiteView({ city, settings }: Props) {
       )}
 
       {/* Leistungen Grid */}
-      <section className="asv-section asv-section--gray">
-        <div className="asv-container">
-          <h2 className="asv-section__title reveal">Unsere Leistungen in {city.cityShort}</h2>
-          <div className="asv-cards reveal">
-            {[
-              { title: 'Ratten & Mäuse', href: '/schaedlinge/ratten' },
-              { title: 'Wespen & Hornissen', href: '/schaedlinge/wespen' },
-              { title: 'Schaben & Kakerlaken', href: '/schaedlinge/schaben' },
-              { title: 'Bettwanzen', href: '/schaedlinge/bettwanzen' },
-              { title: 'Ameisen', href: '/schaedlinge/ameisen' },
-              { title: 'Taubenabwehr', href: '/taubenabwehr' },
-            ].map((s, i) => (
-              <a key={i} href={s.href} className="asv-card asv-card--link">
-                <h3 className="asv-card__title">{s.title}</h3>
-                <span className="asv-card__arrow">→</span>
-              </a>
+      <section className="section section--gray">
+        <div className="container">
+          <div className="section__header" data-animate="fade-up">
+            <span className="section__label">Schädlingsbekämpfung</span>
+            <h2>Unsere Leistungen in {city.cityShort}</h2>
+          </div>
+          <div className="grid grid--3" data-animate="fade-up">
+            {PEST_LINKS.map((s, i) => (
+              <Link key={i} href={s.href} className="pest-card pest-card--lg">
+                <h3 className="pest-card__title">{s.title}</h3>
+                <span className="pest-card__arrow">→</span>
+              </Link>
             ))}
           </div>
         </div>
@@ -155,23 +165,25 @@ export default function StadtseiteView({ city, settings }: Props) {
 
       {/* Kontakt-Sektion */}
       {city.address && (
-        <section className="asv-section asv-section--gray">
-          <div className="asv-container asv-container--narrow">
-            <h2 className="asv-section__title reveal">Ihr Standort in {city.cityShort}</h2>
-            <div className="asv-contact-box reveal">
-              <div className="asv-contact-box__item">
-                <strong>Adresse</strong>
+        <section className="section section--gray">
+          <div className="container container--narrow">
+            <div className="section__header" data-animate="fade-up">
+              <h2>Ihr Standort in {city.cityShort}</h2>
+            </div>
+            <div className="grid grid--3" data-animate="fade-up">
+              <div className="service-card">
+                <h4>Adresse</h4>
                 <p>{city.address.street}<br />{city.address.zip} {city.address.city}</p>
               </div>
               {phone && (
-                <div className="asv-contact-box__item">
-                  <strong>Telefon</strong>
-                  <a href={`tel:${phoneTel}`}>{phone}</a>
+                <div className="service-card">
+                  <h4>Telefon</h4>
+                  <p><a href={`tel:${phoneTel}`} style={{ color: 'var(--brand-red)' }}>{phone}</a></p>
                 </div>
               )}
               {city.plzExample && (
-                <div className="asv-contact-box__item">
-                  <strong>PLZ-Beispiel</strong>
+                <div className="service-card">
+                  <h4>PLZ-Bereich</h4>
                   <p>{city.plzExample}</p>
                 </div>
               )}

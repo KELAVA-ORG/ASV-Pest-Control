@@ -10,7 +10,7 @@ const structure = (S: StructureBuilder) =>
   S.list()
     .title('Inhalte')
     .items([
-      // Einzeldokumente (Singletons)
+      // ── Einstellungen ──────────────────────────────────────
       S.listItem()
         .title('Globale Einstellungen')
         .icon(() => '⚙️')
@@ -18,15 +18,6 @@ const structure = (S: StructureBuilder) =>
           S.document()
             .schemaType('globalSettings')
             .documentId('globalSettings')
-        ),
-      S.divider(),
-      S.listItem()
-        .title('Startseite')
-        .icon(() => '🏠')
-        .child(
-          S.document()
-            .schemaType('siteContent')
-            .documentId('siteContent')
         ),
       S.listItem()
         .title('Navigation')
@@ -45,14 +36,6 @@ const structure = (S: StructureBuilder) =>
             .documentId('footer')
         ),
       S.listItem()
-        .title('Ankündigungsleiste')
-        .icon(() => '📢')
-        .child(
-          S.document()
-            .schemaType('announcementBar')
-            .documentId('announcementBar')
-        ),
-      S.listItem()
         .title('SEO & Crawling')
         .icon(() => '🔍')
         .child(
@@ -68,64 +51,40 @@ const structure = (S: StructureBuilder) =>
             .schemaType('cookieConsent')
             .documentId('cookieConsent')
         ),
+      S.divider(),
+
+      // ── ASV Hauptinhalte ───────────────────────────────────
       S.listItem()
-        .title('Weiterleitungen')
-        .icon(() => '↗️')
+        .title('Schädlingsseiten')
+        .icon(() => '🐀')
         .child(
-          S.documentTypeList('redirect')
-            .title('Weiterleitungen')
-            .defaultOrdering([{ field: '_createdAt', direction: 'desc' }])
+          S.documentTypeList('schaedlingsseite')
+            .title('Schädlingsseiten')
+            .defaultOrdering([{ field: 'title', direction: 'asc' }])
         ),
       S.listItem()
-        .title('Analytics-Events')
-        .icon(() => '📊')
+        .title('Stadtseiten')
+        .icon(() => '🏙️')
         .child(
-          S.document()
-            .schemaType('analyticsEvents')
-            .documentId('analyticsEvents')
-        ),
-      S.listItem()
-        .title('404-Seite')
-        .icon(() => '🚫')
-        .child(
-          S.document()
-            .schemaType('notFoundPage')
-            .documentId('notFoundPage')
+          S.documentTypeList('stadtseite')
+            .title('Stadtseiten')
+            .defaultOrdering([{ field: 'cityName', direction: 'asc' }])
         ),
       S.divider(),
 
-      // Seiten (Page Builder)
+      // ── Seiten & Blog ──────────────────────────────────────
       S.listItem()
         .title('Seiten')
         .icon(() => '📄')
         .child(
           S.documentTypeList('page').title('Seiten')
         ),
-
-      // Formulare
       S.listItem()
-        .title('Formulare')
-        .icon(() => '📋')
+        .title('Rechtliche Seiten')
+        .icon(() => '⚖️')
         .child(
-          S.list()
-            .title('Formulare')
-            .items([
-              S.listItem()
-                .title('Alle Formulare')
-                .icon(() => '📋')
-                .child(S.documentTypeList('form').title('Formulare')),
-              S.listItem()
-                .title('Einträge / Anfragen')
-                .icon(() => '📬')
-                .child(
-                  S.documentTypeList('formSubmission')
-                    .title('Formular-Einträge')
-                    .defaultOrdering([{ field: '_createdAt', direction: 'desc' }])
-                ),
-            ])
+          S.documentTypeList('legalPage').title('Rechtliche Seiten')
         ),
-
-      // Blog
       S.listItem()
         .title('Blog')
         .icon(() => '✍️')
@@ -160,45 +119,60 @@ const structure = (S: StructureBuilder) =>
                 ),
             ])
         ),
-
       S.divider(),
 
-      // Restaurant-Inhalte (BEISPIEL — anpassen pro Projekt)
+      // ── Tools ──────────────────────────────────────────────
       S.listItem()
-        .title('Speisekarte')
-        .icon(() => '🍽️')
+        .title('Formulare')
+        .icon(() => '📋')
         .child(
           S.list()
-            .title('Speisekarte')
+            .title('Formulare')
             .items([
               S.listItem()
-                .title('Kategorien')
-                .child(S.documentTypeList('menuCategory').title('Kategorien')),
+                .title('Alle Formulare')
+                .icon(() => '📋')
+                .child(S.documentTypeList('form').title('Formulare')),
               S.listItem()
-                .title('Beilagen')
-                .child(S.documentTypeList('sideCategory').title('Beilagen')),
+                .title('Einträge / Anfragen')
+                .icon(() => '📬')
+                .child(
+                  S.documentTypeList('formSubmission')
+                    .title('Formular-Einträge')
+                    .defaultOrdering([{ field: '_createdAt', direction: 'desc' }])
+                ),
             ])
         ),
       S.listItem()
-        .title('Öffnungszeiten')
-        .icon(() => '🕐')
+        .title('Weiterleitungen')
+        .icon(() => '↗️')
         .child(
-          S.document()
-            .schemaType('openingHours')
-            .documentId('openingHours')
+          S.documentTypeList('redirect')
+            .title('Weiterleitungen')
+            .defaultOrdering([{ field: '_createdAt', direction: 'desc' }])
         ),
       S.listItem()
-        .title('Rechtliche Seiten')
-        .icon(() => '⚖️')
+        .title('Analytics-Events')
+        .icon(() => '📊')
         .child(
-          S.documentTypeList('legalPage').title('Rechtliche Seiten')
+          S.document()
+            .schemaType('analyticsEvents')
+            .documentId('analyticsEvents')
+        ),
+      S.listItem()
+        .title('404-Seite')
+        .icon(() => '🚫')
+        .child(
+          S.document()
+            .schemaType('notFoundPage')
+            .documentId('notFoundPage')
         ),
     ])
 
 export default defineConfig({
-  name: 'kelava-template',
-  title: 'Kelava Website Template',
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'YOUR_PROJECT_ID',
+  name: 'asv-pest-control',
+  title: 'ASV Pest Control GmbH',
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'z59ogw16',
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
   basePath: '/studio',
   plugins: [

@@ -3783,3 +3783,89 @@ h6.mod-text__heading, h6.mod-hero__heading, h6.mod-imgtext__heading, h6.mod-gall
 .nav__dropdown-link:hover { background: var(--asv-gray, #f8f8f8); }
 .nav__dropdown-label { font-weight: 600; font-size: 0.9rem; }
 .nav__dropdown-desc { font-size: 0.78rem; color: var(--asv-text-muted, #666); margin-top: 0.1rem; }
+
+/* ═══════════════════════════════════════════════
+   ASV HOMEPAGE – zusätzliche Klassen
+   ═══════════════════════════════════════════════ */
+
+/* ── Hero Home ── */
+.asv-hero--home {
+    background-image: linear-gradient(135deg, rgba(15,23,42,0.92) 0%, rgba(20,40,25,0.88) 100%), url('/images/hero-bg.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+/* ── Section Header ── */
+.asv-section__header { text-align: center; margin-bottom: 3rem; }
+.asv-section__header h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); color: var(--asv-dark); margin-bottom: 0.75rem; }
+.asv-section__label {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--asv-green);
+    margin-bottom: 0.6rem;
+}
+.asv-section__desc { color: var(--asv-text-muted); max-width: 600px; margin: 0 auto; line-height: 1.7; }
+
+/* ── Cards 3-column ── */
+.asv-cards--3 { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+
+/* ── Service Card with icon ── */
+.asv-card__icon { color: var(--asv-green); margin-bottom: 1.25rem; }
+.asv-card p { color: var(--asv-text-muted); line-height: 1.65; }
+
+/* ── Pest Grid ── */
+.asv-pest-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1.25rem;
+}
+.asv-pest-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: #fff;
+    border: 1px solid var(--asv-border);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--asv-dark);
+    transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+}
+.asv-pest-card:hover {
+    box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+    transform: translateY(-3px);
+    border-color: var(--asv-green);
+    color: var(--asv-green);
+}
+.asv-pest-card__icon { color: var(--asv-green); margin-bottom: 0.75rem; }
+.asv-pest-card__title { font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem; }
+.asv-pest-card__sub { font-size: 0.8rem; color: var(--asv-text-muted); margin-bottom: 0.75rem; }
+.asv-pest-card__arrow { font-size: 1.1rem; color: var(--asv-green); }
+
+/* ── Benefit Cards ── */
+.asv-benefit-card {
+    padding: 1.75rem;
+    background: #fff;
+    border: 1px solid var(--asv-border);
+    border-radius: 10px;
+}
+.asv-benefit-card__icon { color: var(--asv-green); margin-bottom: 1rem; }
+.asv-benefit-card h3 { font-size: 1.05rem; color: var(--asv-dark); margin-bottom: 0.5rem; }
+.asv-benefit-card p { color: var(--asv-text-muted); line-height: 1.65; font-size: 0.93rem; }
+
+/* ── Region / City Tags ── */
+.asv-region { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
+
+/* ── Testimonials Grid (Homepage) ── */
+.asv-testimonials { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+.asv-testimonial__author { font-weight: 700; color: var(--asv-dark); margin-top: 1rem; }
+
+/* ── Responsive Homepage ── */
+@media (max-width: 768px) {
+    .asv-pest-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+    .asv-section__header { margin-bottom: 2rem; }
+}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./asv.css";
 import { client } from "@/sanity/lib/client";
 import { globalSettingsQuery, cookieConsentQuery, announcementBarQuery, analyticsEventsQuery } from "@/sanity/lib/queries";
 import CookieBanner from "./components/CookieBanner";
@@ -107,7 +108,7 @@ export default async function RootLayout({
 
   // Google Fonts URL
   const fontsUrl = settings?.fontGoogleUrl
-    || 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap';
+    || 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap';
 
   // Favicon
   const faviconUrl = settings?.favicon?.asset?.url;

@@ -59,12 +59,9 @@ export default async function SchaedlingsPage({ params }: Props) {
     <PageLayout navigation={navigation} footer={footer}>
       {/* Hero */}
       <AsvHero
-        badge="Ihr Schädlingsbekämpfer"
         title={page.title}
         subtitle={page.heroSubtitle}
         heroImageUrl={page.heroImage?.asset?.url}
-        phoneFormatted={phone}
-        phoneTel={phoneTel}
         breadcrumbs={[
           { label: 'Startseite', href: '/' },
           { label: 'Schädlinge', href: '/schaedlinge' },
@@ -77,13 +74,11 @@ export default async function SchaedlingsPage({ params }: Props) {
 
       {/* Einleitung */}
       {(page.introTitle || page.introText) && (
-        <section className="asv-section">
-          <div className="asv-container asv-container--narrow reveal">
+        <section className="section">
+          <div className="container container--narrow" data-animate="fade-up">
             {page.introTitle && <h2>{page.introTitle}</h2>}
             {page.introText && page.introText.length > 0 && (
-              <div className="asv-prose">
-                <PortableText value={page.introText} />
-              </div>
+              <PortableText value={page.introText} />
             )}
           </div>
         </section>

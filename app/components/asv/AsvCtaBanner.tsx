@@ -16,14 +16,14 @@ export default function AsvCtaBanner({
   ctaLink = '/express-angebot',
 }: AsvCtaBannerProps) {
   return (
-    <section className="asv-cta-banner">
-      <div className="asv-container">
-        <h2 className="asv-cta-banner__title">{title}</h2>
-        {text && <p className="asv-cta-banner__text">{text}</p>}
-        <div className="asv-cta-banner__actions">
-          <a href={ctaLink} className="asv-btn asv-btn--white asv-btn--lg">{ctaText}</a>
+    <section className="cta-banner">
+      <div className="container">
+        <h2>{title}</h2>
+        {text && <p>{text}</p>}
+        <div className="cta-banner__actions">
+          <a href={ctaLink} className="btn btn--white btn--lg">{ctaText}</a>
           {phoneTel && phoneFormatted && (
-            <a href={`tel:${phoneTel}`} className="asv-btn asv-btn--outline-white asv-btn--lg">
+            <a href={`tel:${phoneTel}`} className="btn btn--outline-white btn--lg">
               Jetzt anrufen: {phoneFormatted}
             </a>
           )}

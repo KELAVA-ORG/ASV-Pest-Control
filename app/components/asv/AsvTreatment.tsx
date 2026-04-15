@@ -12,18 +12,16 @@ export default function AsvTreatment({ title, text, imageUrl, imageAlt, checkLis
   if (!title && !text && !checkList) return null
 
   return (
-    <section className="asv-section asv-section--gray">
-      <div className="asv-container">
-        <div className="asv-split reveal">
-          <div className="asv-split__content">
+    <section className="section section--gray">
+      <div className="container">
+        <div className="split" data-animate="fade-up">
+          <div className="split__content">
             {title && <h2>{title}</h2>}
             {text && text.length > 0 && (
-              <div className="asv-prose">
-                <PortableText value={text as Parameters<typeof PortableText>[0]['value']} />
-              </div>
+              <PortableText value={text as Parameters<typeof PortableText>[0]['value']} />
             )}
             {checkList && checkList.length > 0 && (
-              <ul className="asv-check-list">
+              <ul className="check-list">
                 {checkList.map((item, i) => (
                   <li key={i}>{item}</li>
                 ))}
@@ -31,7 +29,7 @@ export default function AsvTreatment({ title, text, imageUrl, imageAlt, checkLis
             )}
           </div>
           {imageUrl && (
-            <div className="asv-split__image">
+            <div className="split__image">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={imageUrl} alt={imageAlt || ''} loading="lazy" />
             </div>

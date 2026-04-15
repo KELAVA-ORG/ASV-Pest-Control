@@ -12,13 +12,13 @@ const DEFAULT_ITEMS: TrustItem[] = [
 
 export default function AsvTrustBar({ items = DEFAULT_ITEMS }: { items?: TrustItem[] }) {
   return (
-    <section className="asv-trust-bar">
-      <div className="asv-container">
-        <div className="asv-trust-bar__items">
+    <section className="trust-bar">
+      <div className="container">
+        <div className="trust-bar__items">
           {items.map((item, i) => (
-            <div key={i} className="asv-trust-bar__item">
-              <span className="asv-trust-bar__number">{item.number}</span>
-              <span className="asv-trust-bar__label">{item.label}</span>
+            <div key={i} className="trust-bar__item">
+              <span className="trust-bar__number">{item.number}</span>
+              <span className="trust-bar__label">{item.label}</span>
             </div>
           ))}
         </div>
