@@ -172,8 +172,8 @@ const structure = (S: StructureBuilder) =>
 export default defineConfig({
   name: 'asv-pest-control',
   title: 'ASV Pest Control GmbH',
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'z59ogw16',
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  projectId: 'z59ogw16',
+  dataset: 'production',
   basePath: '/studio',
   plugins: [
     structureTool({ structure }),
