@@ -11,6 +11,7 @@ export default defineType({
   },
   fieldsets: [
     { name: 'branding', title: '🏷️ Branding', options: { collapsible: true, collapsed: false } },
+    { name: 'contact', title: '📞 Kontakt & Unternehmen', options: { collapsible: true, collapsed: false } },
     { name: 'colors', title: '🎨 Farben', options: { collapsible: true, collapsed: false } },
     { name: 'typography', title: '🔤 Schriften', options: { collapsible: true, collapsed: false } },
     { name: 'buttons', title: '🔘 Buttons (Global)', options: { collapsible: true, collapsed: true } },
@@ -51,6 +52,71 @@ export default defineType({
       type: 'image',
       description: 'Das kleine Icon im Browser-Tab (idealerweise 32x32 oder SVG)',
       fieldset: 'branding',
+    }),
+
+    /* ─── KONTAKT & UNTERNEHMEN ─── */
+    defineField({
+      name: 'companyName',
+      title: 'Firmenname',
+      type: 'string',
+      initialValue: 'ASV Pest Control GmbH',
+      fieldset: 'contact',
+    }),
+    defineField({
+      name: 'phoneMain',
+      title: 'Haupttelefonnummer',
+      type: 'string',
+      description: 'z.B. "+49 6196 523010" — wird in Header und Footer angezeigt',
+      initialValue: '+49 6196 523010',
+      fieldset: 'contact',
+    }),
+    defineField({
+      name: 'phoneMainFormatted',
+      title: 'Telefon (formatiert, Anzeige)',
+      type: 'string',
+      description: 'z.B. "+49 6196 – 52 30 10"',
+      initialValue: '+49 6196 – 52 30 10',
+      fieldset: 'contact',
+    }),
+    defineField({
+      name: 'phoneMainTel',
+      title: 'Telefon (tel: Link)',
+      type: 'string',
+      description: 'Ohne Leerzeichen, z.B. "+496196523010"',
+      initialValue: '+496196523010',
+      fieldset: 'contact',
+    }),
+    defineField({
+      name: 'email',
+      title: 'E-Mail-Adresse',
+      type: 'string',
+      fieldset: 'contact',
+    }),
+    defineField({
+      name: 'addressMain',
+      title: 'Hauptadresse',
+      type: 'object',
+      fieldset: 'contact',
+      fields: [
+        defineField({ name: 'street', title: 'Straße & Hausnummer', type: 'string' }),
+        defineField({ name: 'zip', title: 'PLZ', type: 'string' }),
+        defineField({ name: 'city', title: 'Stadt', type: 'string' }),
+      ],
+    }),
+    defineField({
+      name: 'ctaButtonText',
+      title: 'Header CTA Button Text',
+      type: 'string',
+      description: 'Text des Buttons rechts im Header',
+      initialValue: 'Express-Angebot',
+      fieldset: 'contact',
+    }),
+    defineField({
+      name: 'ctaButtonLink',
+      title: 'Header CTA Button Link',
+      type: 'string',
+      initialValue: '/express-angebot',
+      fieldset: 'contact',
     }),
 
     /* ─── FARBEN ─── */

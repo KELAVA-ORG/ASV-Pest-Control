@@ -4,6 +4,8 @@ import openingHours from './openingHours'
 import siteContent from './siteContent'
 import legalPage from './legalPage'
 import navigation from './navigation'
+import schaedlingsseite from './schaedlingsseite'
+import stadtseite from './stadtseite'
 import footer from './footer'
 import page from './page'
 import globalSettings from './globalSettings'
@@ -34,6 +36,10 @@ import blogPostsModule from './modules/blogPostsModule'
 import videoModule from './modules/videoModule'
 
 export const schemaTypes = [
+  // ASV Pest Control – Custom Schemas
+  schaedlingsseite,
+  stadtseite,
+
   // Dokumente
   menuCategory,
   sideCategory,
