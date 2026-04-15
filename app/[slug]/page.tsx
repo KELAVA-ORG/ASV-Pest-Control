@@ -1,10 +1,11 @@
 import { client } from '@/sanity/lib/client'
-import { pageQuery, allPagesQuery, navigationQuery, footerQuery, blogPostsQuery } from '@/sanity/lib/queries'
+import { pageQuery, allPagesQuery, navigationQuery, footerQuery, blogPostsQuery, stadtseiteQuery, stadtseiteAllSlugsQuery, globalSettingsQuery } from '@/sanity/lib/queries'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import ModuleRenderer from '../components/ModuleRenderer'
 import PageLayout from '../components/PageLayout'
 import SchemaJsonLd from '../components/SchemaJsonLd'
+import StadtseiteView from '../components/asv/StadtseiteView'
 
 export const revalidate = 60
 
@@ -242,14 +243,24 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  const pages = await client.fetch(allPagesQuery)
-  return pages.map((page: { slug: { current: string } }) => ({
-    slug: page.slug.current,
-  }))
+  const [pages, staedte] = await Promise.all([
+    client.fetch(allPagesQuery),
+    client.fetch(stadtseiteAllSlugsQuery),
+  ])
+  const pageSlugs = (pages || []).map((p: { slug: { current: string } }) => ({ slug: p.slug.current }))
+  const stadtSlugs = (staedte || []).map((s: { slug: { current: string } }) => ({ slug: s.slug.current }))
+  return [...pageSlugs, ...stadtSlugs]
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
+  const stadtseite = await client.fetch(stadtseiteQuery, { slug })
+  if (stadtseite) {
+    return {
+      title: stadtseite.seoTitle || `Kammerjäger ${stadtseite.cityName} | ASV Pest Control GmbH`,
+      description: stadtseite.seoDescription || '',
+    }
+  }
   const page: PageData | null = await client.fetch(pageQuery, { slug })
 
   if (!page) return {}
@@ -275,11 +286,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function DynamicPage({ params }: Props) {
   const { slug } = await params
-  const [page, navigation, footer] = await Promise.all([
-    client.fetch(pageQuery, { slug }),
+
+  const [stadtseite, navigation, footer, settings] = await Promise.all([
+    client.fetch(stadtseiteQuery, { slug }),
     client.fetch(navigationQuery),
     client.fetch(footerQuery),
-  ]) as [PageData | null, NavigationData | null, FooterData | null]
+    client.fetch(globalSettingsQuery),
+  ])
+
+  // Stadtseite gefunden → City-Template rendern
+  if (stadtseite) {
+    return (
+      <PageLayout navigation={navigation} footer={footer}>
+        <StadtseiteView city={stadtseite} settings={settings} />
+      </PageLayout>
+    )
+  }
+
+  const [page] = await Promise.all([
+    client.fetch(pageQuery, { slug }),
+  ]) as [PageData | null]
 
   if (!page) {
     notFound()

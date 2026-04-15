@@ -11,6 +11,12 @@ interface SanityImage {
   alt?: string
 }
 
+interface DropdownItem {
+  label: string
+  link: string
+  description?: string
+}
+
 interface MenuItem {
   label: string
   linkType?: string
@@ -18,6 +24,8 @@ interface MenuItem {
   internalPage?: { _type?: string; slug: { current: string } }
   openInNewTab?: boolean
   mobileOnly?: boolean
+  hasDropdown?: boolean
+  dropdownItems?: DropdownItem[]
 }
 
 interface NavigationData {
@@ -208,6 +216,24 @@ export default function PageLayout({ navigation: nav, footer: foot, blogBasePath
         <ul className="nav__links">
           {desktopItems.map((item, idx) => {
             const href = resolveMenuLink(item)
+            if (item.hasDropdown && item.dropdownItems && item.dropdownItems.length > 0) {
+              return (
+                <li key={idx} className="nav__item nav__item--dropdown">
+                  <span className="nav__link nav__link--dropdown">
+                    {item.label}
+                    <svg className="nav__chevron" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </span>
+                  <div className="nav__dropdown">
+                    {item.dropdownItems.map((di, di_idx) => (
+                      <Link key={di_idx} href={di.link} className="nav__dropdown-link">
+                        <span className="nav__dropdown-label">{di.label}</span>
+                        {di.description && <span className="nav__dropdown-desc">{di.description}</span>}
+                      </Link>
+                    ))}
+                  </div>
+                </li>
+              )
+            }
             return (
               <li key={idx}>
                 {href.startsWith('/') ? (

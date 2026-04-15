@@ -22,7 +22,68 @@ export const globalSettingsQuery = `*[_type == "globalSettings"][0] {
   backToTopIconColor,
   backToTopSize,
   backToTopPosition,
-  backToTopStyle
+  backToTopStyle,
+  companyName,
+  phoneMain,
+  phoneMainFormatted,
+  phoneMainTel,
+  email,
+  addressMain { street, zip, city },
+  ctaButtonText,
+  ctaButtonLink
+}`
+
+export const schaedlingsseiteQuery = `*[_type == "schaedlingsseite" && slug.current == $slug][0] {
+  title,
+  slug,
+  seoTitle,
+  seoDescription,
+  heroImage { asset-> { url }, alt },
+  heroSubtitle,
+  introTitle,
+  introText[] { ..., _type == "image" => { asset-> { url }, alt } },
+  signsTitle,
+  signs[] { title, description },
+  risksTitle,
+  risks[] { title, description },
+  treatmentTitle,
+  treatmentText[] { ..., _type == "image" => { asset-> { url }, alt } },
+  treatmentImage { asset-> { url }, alt },
+  treatmentCheckList,
+  processTitle,
+  processSteps[] { stepNumber, title, description },
+  ctaBannerTitle,
+  ctaBannerText,
+  faqTitle,
+  faqs[] { question, answer }
+}`
+
+export const schaedlingsseiteAllSlugsQuery = `*[_type == "schaedlingsseite" && !(_id in path("drafts.**"))] {
+  slug { current }
+}`
+
+export const stadtseiteQuery = `*[_type == "stadtseite" && slug.current == $slug][0] {
+  cityName,
+  cityShort,
+  slug,
+  seoTitle,
+  seoDescription,
+  phone,
+  phoneFormatted,
+  phoneTel,
+  address { street, zip, city },
+  geo { lat, lng },
+  plzExample,
+  heroSubtitle,
+  cityDescription,
+  districts,
+  einsatzgebietDesc,
+  testimonials[] { text, author, location, rating },
+  faqs[] { question, answer, answerSchema }
+}`
+
+export const stadtseiteAllSlugsQuery = `*[_type == "stadtseite" && !(_id in path("drafts.**"))] {
+  slug { current }
 }`
 
 export const menuQuery = `*[_type == "menuCategory"] | order(order asc) {
@@ -86,7 +147,9 @@ export const navigationQuery = `*[_type == "navigation"][0] {
     link,
     internalPage-> { _type, slug { current } },
     openInNewTab,
-    mobileOnly
+    mobileOnly,
+    hasDropdown,
+    dropdownItems[] { label, link, description }
   },
   ctaEnabled,
   ctaText,
