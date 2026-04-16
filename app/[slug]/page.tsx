@@ -1,7 +1,8 @@
 import { client } from '@/sanity/lib/client'
-import { pageQuery, allPagesQuery, navigationQuery, footerQuery, blogPostsQuery, stadtseiteQuery, stadtseiteAllSlugsQuery, globalSettingsQuery } from '@/sanity/lib/queries'
+import { pageQuery, allPagesQuery, allLegalPagesQuery, legalPageQuery, navigationQuery, footerQuery, blogPostsQuery, stadtseiteQuery, stadtseiteAllSlugsQuery, globalSettingsQuery } from '@/sanity/lib/queries'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
+import { PortableText } from '@portabletext/react'
 import ModuleRenderer from '../components/ModuleRenderer'
 import PageLayout from '../components/PageLayout'
 import SchemaJsonLd from '../components/SchemaJsonLd'
@@ -243,13 +244,15 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  const [pages, staedte] = await Promise.all([
+  const [pages, staedte, legalPages] = await Promise.all([
     client.fetch(allPagesQuery),
     client.fetch(stadtseiteAllSlugsQuery),
+    client.fetch(allLegalPagesQuery),
   ])
   const pageSlugs = (pages || []).map((p: { slug: { current: string } }) => ({ slug: p.slug.current }))
   const stadtSlugs = (staedte || []).map((s: { slug: { current: string } }) => ({ slug: s.slug.current }))
-  return [...pageSlugs, ...stadtSlugs]
+  const legalSlugs = (legalPages || []).map((p: { slug: { current: string } }) => ({ slug: p.slug.current }))
+  return [...pageSlugs, ...stadtSlugs, ...legalSlugs]
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -299,6 +302,32 @@ export default async function DynamicPage({ params }: Props) {
     return (
       <PageLayout navigation={navigation} footer={footer}>
         <StadtseiteView city={stadtseite} settings={settings} />
+      </PageLayout>
+    )
+  }
+
+  // LegalPage (Impressum, Datenschutz, etc.)
+  const legalPage = await client.fetch(legalPageQuery, { slug })
+  if (legalPage) {
+    return (
+      <PageLayout navigation={navigation} footer={footer}>
+        <div className="legal-content">
+          <h1>{legalPage.title}</h1>
+          {legalPage.content && (
+            <PortableText
+              value={legalPage.content}
+              components={{
+                marks: {
+                  link: ({ children, value }) => (
+                    <a href={value?.href} target={value?.href?.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer">
+                      {children}
+                    </a>
+                  ),
+                },
+              }}
+            />
+          )}
+        </div>
       </PageLayout>
     )
   }

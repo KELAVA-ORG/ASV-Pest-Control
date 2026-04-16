@@ -614,6 +614,16 @@ export const allPagesQuery = `*[_type == "page"] {
   slug { current }
 }`
 
+export const allLegalPagesQuery = `*[_type == "legalPage"] {
+  slug { current }
+}`
+
+export const legalPageQuery = `*[_type == "legalPage" && slug.current == $slug][0] {
+  title,
+  slug,
+  content[]
+}`
+
 /* ═══ ASV SEITEN ═══ */
 
 export const homePageQuery = `*[_type == "homePage"][0] {
