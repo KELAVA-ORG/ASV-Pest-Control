@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
 import { client } from '@/sanity/lib/client'
-import { navigationQuery, footerQuery, globalSettingsQuery } from '@/sanity/lib/queries'
+import { navigationQuery, footerQuery, globalSettingsQuery, taubenabwehrPageQuery } from '@/sanity/lib/queries'
 import PageLayout from '@/app/components/PageLayout'
 import AsvHero from '@/app/components/asv/AsvHero'
 import AsvCtaBanner from '@/app/components/asv/AsvCtaBanner'
 import AsvFaq from '@/app/components/asv/AsvFaq'
-import Link from 'next/link'
 
 export const revalidate = 60
 
@@ -14,7 +13,7 @@ export const metadata: Metadata = {
   description: 'Dauerhafter Schutz vor Tauben – tierschutzkonform und ästhetisch unauffällig. Spikes, Netze, elektrische Systeme. IHK-zertifiziert, kostenlose Beratung.',
 }
 
-const FAQS = [
+const DEFAULT_FAQS = [
   {
     question: 'Welche Taubenabwehrsysteme gibt es?',
     answer: 'Es gibt verschiedene Systeme wie Spikes (Abweiserspitzen), Netze, Spanndrähte, elektrische Abwehrsysteme und optische Vergrämungsmittel. Welches System am besten geeignet ist, hängt von der Gebäudesituation und dem Ausmaß des Taubenbefalls ab. Wir beraten Sie kostenlos vor Ort.',
@@ -37,34 +36,16 @@ const FAQS = [
   },
 ]
 
-const SYSTEMS = [
-  {
-    title: 'Spikesysteme',
-    text: 'Abweiserspitzen aus Edelstahl oder Polycarbonat – ideal für Fensterbänke, Gesimse und Dachkanten. Tierschutzkonform, langlebig und optisch dezent.',
-  },
-  {
-    title: 'Netz-Systeme',
-    text: 'Vollflächige Abschirmung von Dachterrassen, Innenhöfen und Gebäudeabschnitten. UV-beständig, nahezu unsichtbar und bis zu 20 Jahre haltbar.',
-  },
-  {
-    title: 'Elektrische Systeme',
-    text: 'Strömungsimpulse erzeugen ein unangenehmes Gefühl ohne Verletzungsgefahr. Ideal für historische Gebäude und repräsentative Fassaden.',
-  },
-  {
-    title: 'Spanndrahtsysteme',
-    text: 'Feine Stahldrähte stören die Landung der Tauben effektiv. Nahezu unsichtbar und besonders für denkmalgeschützte Gebäude geeignet.',
-  },
-  {
-    title: 'Vergrämungsmittel',
-    text: 'Optische und akustische Vergrämung sowie Geruchsmittel (z.B. Superexpel) für den sofortigen Einsatz und als ergänzende Maßnahme.',
-  },
-  {
-    title: 'Reinigung & Desinfektion',
-    text: 'Fachgerechte Entfernung von Taubenkot und Desinfektion der betroffenen Bereiche – wichtig vor der Montage von Abwehrsystemen.',
-  },
+const DEFAULT_SYSTEMS = [
+  { title: 'Spikesysteme', description: 'Abweiserspitzen aus Edelstahl oder Polycarbonat – ideal für Fensterbänke, Gesimse und Dachkanten. Tierschutzkonform, langlebig und optisch dezent.' },
+  { title: 'Netz-Systeme', description: 'Vollflächige Abschirmung von Dachterrassen, Innenhöfen und Gebäudeabschnitten. UV-beständig, nahezu unsichtbar und bis zu 20 Jahre haltbar.' },
+  { title: 'Elektrische Systeme', description: 'Strömungsimpulse erzeugen ein unangenehmes Gefühl ohne Verletzungsgefahr. Ideal für historische Gebäude und repräsentative Fassaden.' },
+  { title: 'Spanndrahtsysteme', description: 'Feine Stahldrähte stören die Landung der Tauben effektiv. Nahezu unsichtbar und besonders für denkmalgeschützte Gebäude geeignet.' },
+  { title: 'Vergrämungsmittel', description: 'Optische und akustische Vergrämung sowie Geruchsmittel (z.B. Superexpel) für den sofortigen Einsatz und als ergänzende Maßnahme.' },
+  { title: 'Reinigung & Desinfektion', description: 'Fachgerechte Entfernung von Taubenkot und Desinfektion der betroffenen Bereiche – wichtig vor der Montage von Abwehrsystemen.' },
 ]
 
-const VALUES = [
+const DEFAULT_CHECKLIST = [
   'Kostenlose Vor-Ort-Besichtigung und Beratung',
   'Individuelle Lösung für jede Gebäudesituation',
   'Tierschutzkonforme Systeme ohne Verletzungsgefahr',
@@ -74,15 +55,39 @@ const VALUES = [
   'Auch für denkmalgeschützte Gebäude geeignet',
 ]
 
+const DEFAULT_STEPS = [
+  { num: '01', title: 'Besichtigung', text: 'Kostenlose Begutachtung Ihres Gebäudes und Analyse des Taubenbefalls sowie der Niststellen.' },
+  { num: '02', title: 'Konzept', text: 'Erstellung eines maßgeschneiderten Abwehrkonzepts mit transparenter Kostenkalkulation.' },
+  { num: '03', title: 'Installation', text: 'Fachgerechte Montage der Abwehrsysteme durch unsere geschulten Techniker.' },
+  { num: '04', title: 'Kontrolle', text: 'Nachkontrolle und bei Bedarf Anpassung der Systeme für optimalen Schutz.' },
+]
+
 export default async function TaubenabwehrPage() {
-  const [navigation, footer, settings] = await Promise.all([
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [navigation, footer, settings, page] = await Promise.all([
     client.fetch(navigationQuery),
     client.fetch(footerQuery),
     client.fetch(globalSettingsQuery),
-  ])
+    client.fetch(taubenabwehrPageQuery),
+  ]) as [any, any, any, any]
 
   const phone = settings?.phoneMainFormatted || '+49 6196 – 52 30 10'
   const phoneTel = settings?.phoneMainTel || '+496196523010'
+
+  const heroImageUrl = page?.heroImage?.asset?.url || '/images/taubenabwehr.webp'
+  const heroSubtitle = page?.heroSubtitle || 'Dauerhafter Schutz für Ihr Gebäude – tierschutzkonform und ästhetisch unauffällig'
+  const introTitle = page?.introTitle || 'Das Taubenproblem an Gebäuden'
+  const systems = page?.services?.length ? page.services : DEFAULT_SYSTEMS
+  const splitTitle = page?.splitTitle || 'Warum ASV Taubenabwehr?'
+  const splitChecklist: string[] = page?.splitChecklist?.length ? page.splitChecklist : DEFAULT_CHECKLIST
+  const splitImageUrl = page?.splitImage?.asset?.url || '/images/schaedlingsbekaempfer.webp'
+  const splitImageAlt = page?.splitImage?.alt || 'ASV Pest Control Techniker bei der Taubenabwehr'
+  const processTitle = page?.processTitle || 'Unser Vorgehen'
+  const processSteps = page?.processSteps?.length ? page.processSteps : DEFAULT_STEPS
+  const faqTitle = page?.faqTitle || 'Häufige Fragen zur Taubenabwehr'
+  const faqs = page?.faqs?.length ? page.faqs : DEFAULT_FAQS
+  const ctaTitle = page?.ctaTitle || 'Taubenplage? Wir schützen Ihr Gebäude.'
+  const ctaText = page?.ctaText || 'Kostenlose Vor-Ort-Besichtigung und individuelles Abwehrkonzept.'
 
   return (
     <PageLayout navigation={navigation} footer={footer}>
@@ -99,8 +104,8 @@ export default async function TaubenabwehrPage() {
       {/* Hero */}
       <AsvHero
         title="Professionelle Taubenabwehr"
-        subtitle="Dauerhafter Schutz für Ihr Gebäude – tierschutzkonform und ästhetisch unauffällig"
-        heroImageUrl="/images/taubenabwehr.webp"
+        subtitle={heroSubtitle}
+        heroImageUrl={heroImageUrl}
         breadcrumbs={[
           { label: 'Startseite', href: '/' },
           { label: 'Taubenabwehr' },
@@ -110,10 +115,23 @@ export default async function TaubenabwehrPage() {
       {/* Problem */}
       <section className="section">
         <div className="container container--narrow" data-animate="fade-up">
-          <h2>Das Taubenproblem an Gebäuden</h2>
-          <p>Taubenkot ist nicht nur unansehnlich, sondern greift Fassaden, Dächer und Metallkonstruktionen an. Die aggressive Säure im Kot zersetzt Beton, Sandstein und Metall und verursacht langfristig erhebliche Bauschäden. Unbehandelt können die Reparaturkosten schnell in den fünf- bis sechsstelligen Bereich steigen.</p>
-          <p>Gleichzeitig stellt Taubenkot ein ernsthaftes Gesundheitsrisiko dar. Er kann Krankheitserreger wie Salmonellen, Chlamydien und Pilzsporen enthalten, die beim Einatmen von Staubpartikeln übertragen werden. Besonders gefährdet sind Menschen mit geschwächtem Immunsystem.</p>
-          <p>Für gewerbliche Betriebe – insbesondere in der Gastronomie und Lebensmittelbranche – bedeutet Taubenbefall zudem ein erhebliches Hygienerisiko und kann zu Bußgeldern bei Kontrollen führen.</p>
+          <h2>{introTitle}</h2>
+          {page?.introText ? (
+            <div>
+              {/* Portable text fallback – render plain text blocks */}
+              {page.introText.map((block: any, i: number) => (
+                block._type === 'block' && block.children ? (
+                  <p key={i}>{block.children.map((c: any) => c.text).join('')}</p>
+                ) : null
+              ))}
+            </div>
+          ) : (
+            <>
+              <p>Taubenkot ist nicht nur unansehnlich, sondern greift Fassaden, Dächer und Metallkonstruktionen an. Die aggressive Säure im Kot zersetzt Beton, Sandstein und Metall und verursacht langfristig erhebliche Bauschäden. Unbehandelt können die Reparaturkosten schnell in den fünf- bis sechsstelligen Bereich steigen.</p>
+              <p>Gleichzeitig stellt Taubenkot ein ernsthaftes Gesundheitsrisiko dar. Er kann Krankheitserreger wie Salmonellen, Chlamydien und Pilzsporen enthalten, die beim Einatmen von Staubpartikeln übertragen werden. Besonders gefährdet sind Menschen mit geschwächtem Immunsystem.</p>
+              <p>Für gewerbliche Betriebe – insbesondere in der Gastronomie und Lebensmittelbranche – bedeutet Taubenbefall zudem ein erhebliches Hygienerisiko und kann zu Bußgeldern bei Kontrollen führen.</p>
+            </>
+          )}
         </div>
       </section>
 
@@ -124,7 +142,7 @@ export default async function TaubenabwehrPage() {
             <h2>Taubenabwehrsysteme im Überblick</h2>
           </div>
           <div className="grid grid--3" data-animate="fade-up" data-animate-delay="100">
-            {SYSTEMS.map((s, i) => (
+            {systems.map((s: { title: string; description: string }, i: number) => (
               <div key={i} className="service-card">
                 <div className="service-card__icon">
                   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -133,7 +151,7 @@ export default async function TaubenabwehrPage() {
                   </svg>
                 </div>
                 <h3>{s.title}</h3>
-                <p>{s.text}</p>
+                <p>{s.description}</p>
               </div>
             ))}
           </div>
@@ -145,15 +163,23 @@ export default async function TaubenabwehrPage() {
         <div className="container">
           <div className="split" data-animate="fade-up">
             <div className="split__content">
-              <h2>Warum ASV Taubenabwehr?</h2>
-              <p>Unsere IHK-zertifizierten Techniker analysieren Ihr Gebäude und entwickeln ein maßgeschneidertes Konzept. Wir kennen die Gewohnheiten der Tauben und wissen, welches System wo am wirkungsvollsten ist – und vor allem welches zu Ihrem Gebäude und Budget passt.</p>
+              <h2>{splitTitle}</h2>
+              {page?.splitText ? (
+                page.splitText.map((block: any, i: number) => (
+                  block._type === 'block' && block.children ? (
+                    <p key={i}>{block.children.map((c: any) => c.text).join('')}</p>
+                  ) : null
+                ))
+              ) : (
+                <p>Unsere IHK-zertifizierten Techniker analysieren Ihr Gebäude und entwickeln ein maßgeschneidertes Konzept. Wir kennen die Gewohnheiten der Tauben und wissen, welches System wo am wirkungsvollsten ist – und vor allem welches zu Ihrem Gebäude und Budget passt.</p>
+              )}
               <ul className="check-list">
-                {VALUES.map((v, i) => <li key={i}>{v}</li>)}
+                {splitChecklist.map((v: string, i: number) => <li key={i}>{v}</li>)}
               </ul>
             </div>
             <div className="split__image">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/schaedlingsbekaempfer.webp" alt="ASV Pest Control Techniker bei der Taubenabwehr" width="972" height="800" loading="lazy" />
+              <img src={splitImageUrl} alt={splitImageAlt} width="972" height="800" loading="lazy" />
             </div>
           </div>
         </div>
@@ -163,15 +189,10 @@ export default async function TaubenabwehrPage() {
       <section className="section section--gray">
         <div className="container">
           <div className="section__header" data-animate="fade-up">
-            <h2>Unser Vorgehen</h2>
+            <h2>{processTitle}</h2>
           </div>
           <div className="process__steps" data-animate="fade-up" data-animate-delay="100">
-            {[
-              { num: '01', title: 'Besichtigung', text: 'Kostenlose Begutachtung Ihres Gebäudes und Analyse des Taubenbefalls sowie der Niststellen.' },
-              { num: '02', title: 'Konzept', text: 'Erstellung eines maßgeschneiderten Abwehrkonzepts mit transparenter Kostenkalkulation.' },
-              { num: '03', title: 'Installation', text: 'Fachgerechte Montage der Abwehrsysteme durch unsere geschulten Techniker.' },
-              { num: '04', title: 'Kontrolle', text: 'Nachkontrolle und bei Bedarf Anpassung der Systeme für optimalen Schutz.' },
-            ].map((step, i) => (
+            {processSteps.map((step: { num: string; title: string; text: string }, i: number) => (
               <div key={i} className="process__step">
                 <div className="process__number">{step.num}</div>
                 <h3>{step.title}</h3>
@@ -184,15 +205,15 @@ export default async function TaubenabwehrPage() {
 
       {/* CTA */}
       <AsvCtaBanner
-        title="Taubenplage? Wir schützen Ihr Gebäude."
-        text="Kostenlose Vor-Ort-Besichtigung und individuelles Abwehrkonzept."
+        title={ctaTitle}
+        text={ctaText}
         phoneFormatted={phone}
         phoneTel={phoneTel}
         ctaText="Kostenlos beraten lassen"
       />
 
       {/* FAQ */}
-      <AsvFaq title="Häufige Fragen zur Taubenabwehr" faqs={FAQS} />
+      <AsvFaq title={faqTitle} faqs={faqs} />
     </PageLayout>
   )
 }

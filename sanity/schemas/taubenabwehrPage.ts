@@ -1,0 +1,173 @@
+import { defineType, defineField } from 'sanity'
+
+export default defineType({
+  name: 'taubenabwehrPage',
+  title: 'Taubenabwehr-Seite',
+  type: 'document',
+  preview: {
+    prepare() {
+      return { title: 'Taubenabwehr-Seite' }
+    },
+  },
+  groups: [
+    { name: 'content', title: 'Inhalt', default: true },
+  ],
+  fields: [
+    /* ─── HERO ─── */
+    defineField({
+      name: 'heroImage',
+      title: 'Hero-Bild',
+      type: 'image',
+      options: { hotspot: true },
+      fields: [
+        defineField({ name: 'alt', title: 'Alt-Text', type: 'string' }),
+      ],
+      group: 'content',
+    }),
+    defineField({
+      name: 'heroSubtitle',
+      title: 'Hero-Untertitel',
+      type: 'string',
+      group: 'content',
+    }),
+
+    /* ─── EINLEITUNG ─── */
+    defineField({
+      name: 'introTitle',
+      title: 'Einleitungs-Überschrift',
+      type: 'string',
+      group: 'content',
+    }),
+    defineField({
+      name: 'introText',
+      title: 'Einleitungstext',
+      type: 'array',
+      of: [{ type: 'block' }],
+      group: 'content',
+    }),
+
+    /* ─── SYSTEME / SERVICES ─── */
+    defineField({
+      name: 'services',
+      title: 'Taubenabwehr-Systeme (6 Karten)',
+      type: 'array',
+      group: 'content',
+      of: [
+        {
+          type: 'object',
+          name: 'service',
+          title: 'System',
+          preview: { select: { title: 'title' } },
+          fields: [
+            defineField({ name: 'title', title: 'Titel', type: 'string', validation: (Rule) => Rule.required() }),
+            defineField({ name: 'description', title: 'Beschreibung', type: 'text', rows: 3 }),
+          ],
+        },
+      ],
+    }),
+
+    /* ─── SPLIT SECTION ─── */
+    defineField({
+      name: 'splitTitle',
+      title: 'Split-Überschrift (z.B. "Warum ASV Taubenabwehr?")',
+      type: 'string',
+      group: 'content',
+    }),
+    defineField({
+      name: 'splitText',
+      title: 'Split-Text',
+      type: 'array',
+      of: [{ type: 'block' }],
+      group: 'content',
+    }),
+    defineField({
+      name: 'splitImage',
+      title: 'Split-Bild',
+      type: 'image',
+      options: { hotspot: true },
+      fields: [
+        defineField({ name: 'alt', title: 'Alt-Text', type: 'string' }),
+      ],
+      group: 'content',
+    }),
+    defineField({
+      name: 'splitChecklist',
+      title: 'Check-Liste',
+      type: 'array',
+      of: [{ type: 'string' }],
+      group: 'content',
+    }),
+
+    /* ─── PROZESS ─── */
+    defineField({
+      name: 'processTitle',
+      title: 'Prozess-Überschrift',
+      type: 'string',
+      group: 'content',
+    }),
+    defineField({
+      name: 'processSteps',
+      title: 'Prozess-Schritte',
+      type: 'array',
+      group: 'content',
+      of: [
+        {
+          type: 'object',
+          name: 'processStep',
+          title: 'Schritt',
+          preview: {
+            select: { num: 'num', title: 'title' },
+            prepare({ num, title }) {
+              return { title: `${num} – ${title}` }
+            },
+          },
+          fields: [
+            defineField({ name: 'num', title: 'Nummer (z.B. "01")', type: 'string', validation: (Rule) => Rule.required() }),
+            defineField({ name: 'title', title: 'Titel', type: 'string', validation: (Rule) => Rule.required() }),
+            defineField({ name: 'text', title: 'Text', type: 'text', rows: 2 }),
+          ],
+        },
+      ],
+    }),
+
+    /* ─── FAQ ─── */
+    defineField({
+      name: 'faqTitle',
+      title: 'FAQ-Überschrift',
+      type: 'string',
+      group: 'content',
+    }),
+    defineField({
+      name: 'faqs',
+      title: 'FAQ-Einträge',
+      type: 'array',
+      group: 'content',
+      of: [
+        {
+          type: 'object',
+          name: 'faq',
+          title: 'FAQ',
+          preview: { select: { title: 'question' } },
+          fields: [
+            defineField({ name: 'question', title: 'Frage', type: 'string', validation: (Rule) => Rule.required() }),
+            defineField({ name: 'answer', title: 'Antwort', type: 'text', rows: 4 }),
+          ],
+        },
+      ],
+    }),
+
+    /* ─── CTA ─── */
+    defineField({
+      name: 'ctaTitle',
+      title: 'CTA-Überschrift',
+      type: 'string',
+      group: 'content',
+    }),
+    defineField({
+      name: 'ctaText',
+      title: 'CTA-Text',
+      type: 'string',
+      group: 'content',
+    }),
+  ],
+})

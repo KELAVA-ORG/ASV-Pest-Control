@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { client } from '@/sanity/lib/client'
-import { navigationQuery, footerQuery, globalSettingsQuery } from '@/sanity/lib/queries'
+import { navigationQuery, footerQuery, globalSettingsQuery, superexpelPageQuery } from '@/sanity/lib/queries'
 import PageLayout from '@/app/components/PageLayout'
 import AsvHero from '@/app/components/asv/AsvHero'
 import AsvCtaBanner from '@/app/components/asv/AsvCtaBanner'
@@ -13,32 +13,27 @@ export const metadata: Metadata = {
   description: 'Superexpel – effektives Vergrämungsmittel gegen Marder und Wildtiere auf natürlicher Basis. 20.000+ Anwendungen. Sicher für Mensch und Tier.',
 }
 
-const USES = [
-  {
-    title: 'Motorraum',
-    text: 'Schützen Sie Ihr Fahrzeug vor Marderbissen. Superexpel hält Marder dauerhaft fern – ohne Falle, ohne Elektroschock.',
-    icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>,
-  },
-  {
-    title: 'Dachboden & Keller',
-    text: 'Gegen Marder, Ratten und andere Wildtiere in Gebäuden. Einfach ausbringen und mehrere Wochen geschützt.',
-    icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-  },
-  {
-    title: 'Garten & Außenbereich',
-    text: 'Halten Sie Wildtiere aus Ihrem Garten, Ihrer Terrasse oder von Mülltonnen fern – tierschutzkonform.',
-    icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22V12m0 0C12 7 8 4 3 5c0 5 3 9 9 7m0 0c0-5 4-8 9-7-1 5-4 9-9 7"/></svg>,
-  },
+const DEFAULT_USES = [
+  { title: 'Motorraum', text: 'Schützen Sie Ihr Fahrzeug vor Marderbissen. Superexpel hält Marder dauerhaft fern – ohne Falle, ohne Elektroschock.' },
+  { title: 'Dachboden & Keller', text: 'Gegen Marder, Ratten und andere Wildtiere in Gebäuden. Einfach ausbringen und mehrere Wochen geschützt.' },
+  { title: 'Garten & Außenbereich', text: 'Halten Sie Wildtiere aus Ihrem Garten, Ihrer Terrasse oder von Mülltonnen fern – tierschutzkonform.' },
 ]
 
-const STEPS = [
+const DEFAULT_STATS = [
+  { num: 'Nr. 1', label: 'Vergrämungsmittel' },
+  { num: '20.000+', label: 'Anwendungen' },
+  { num: '100%', label: 'Natürliche Basis' },
+  { num: '4–6', label: 'Wochen Wirkung' },
+]
+
+const DEFAULT_STEPS = [
   { num: '01', title: 'Bereich reinigen', text: 'Entfernen Sie vorhandene Spuren und reinigen Sie die betroffene Fläche vor der Anwendung.' },
   { num: '02', title: 'Pulver verteilen', text: 'Streuen Sie Superexpel gleichmäßig im betroffenen Bereich aus. Keine Schutzausrüstung nötig.' },
   { num: '03', title: 'Wirken lassen', text: 'Die natürlichen Duftstoffe entfalten ihre Wirkung sofort und halten mehrere Wochen an.' },
   { num: '04', title: 'Nachbehandlung', text: 'Tragen Sie nach 4–6 Wochen oder nach starkem Regen erneut auf für dauerhaften Schutz.' },
 ]
 
-const FAQS = [
+const DEFAULT_FAQS = [
   {
     question: 'Für welche Tiere ist Superexpel geeignet?',
     answer: 'Superexpel ist besonders wirksam gegen Marder, aber auch gegen andere Wildtiere wie Ratten, Mäuse und Katzen, die sich in unerwünschten Bereichen aufhalten. Das Mittel stört die Tiere durch natürliche Duftstoffe, ohne ihnen zu schaden.',
@@ -57,22 +52,47 @@ const FAQS = [
   },
 ]
 
+const DEFAULT_CHECKLIST = [
+  'Natürliche Inhaltsstoffe – sicher für Mensch und Tier',
+  'Langanhaltende Wirkung über mehrere Wochen',
+  'Einfache Anwendung ohne Fachkenntnisse',
+  'Über 20.000 erfolgreiche Anwendungen',
+  'Tierschutzkonform und unbedenklich',
+]
+
 export default async function SuperexpelPage() {
-  const [navigation, footer, settings] = await Promise.all([
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [navigation, footer, settings, page] = await Promise.all([
     client.fetch(navigationQuery),
     client.fetch(footerQuery),
     client.fetch(globalSettingsQuery),
-  ])
+    client.fetch(superexpelPageQuery),
+  ]) as [any, any, any, any]
 
   const phone = settings?.phoneMainFormatted || '+49 6196 – 52 30 10'
   const phoneTel = settings?.phoneMainTel || '+496196523010'
+
+  const heroSubtitle = page?.heroSubtitle || 'Effektiver Schutz gegen Marder und Wildtiere auf natürlicher Basis'
+  const introTitle = page?.introTitle || 'Superexpel – Effektiver Schutz auf natürlicher Basis'
+  const introImageUrl = page?.introImage?.asset?.url || '/images/marderbekaempfung.webp'
+  const introImageAlt = page?.introImage?.alt || 'Superexpel Vergrämungsmittel'
+  const introChecklist: string[] = page?.introChecklist?.length ? page.introChecklist : DEFAULT_CHECKLIST
+  const stats = page?.stats?.length ? page.stats : DEFAULT_STATS
+  const usesTitle = page?.usesTitle || 'Anwendungsbereiche'
+  const uses = page?.uses?.length ? page.uses : DEFAULT_USES
+  const processTitle = page?.processTitle || 'So einfach geht\'s'
+  const processSteps = page?.processSteps?.length ? page.processSteps : DEFAULT_STEPS
+  const faqTitle = page?.faqTitle || 'Häufige Fragen zu Superexpel'
+  const faqs = page?.faqs?.length ? page.faqs : DEFAULT_FAQS
+  const ctaTitle = page?.ctaTitle || 'Interesse an Superexpel?'
+  const ctaText = page?.ctaText || 'Kontaktieren Sie uns für Verfügbarkeit, Preise und persönliche Beratung.'
 
   return (
     <PageLayout navigation={navigation} footer={footer}>
       {/* Hero */}
       <AsvHero
         title="Superexpel – Das Nr. 1 Vergrämungsmittel"
-        subtitle="Effektiver Schutz gegen Marder und Wildtiere auf natürlicher Basis"
+        subtitle={heroSubtitle}
         breadcrumbs={[
           { label: 'Startseite', href: '/' },
           { label: 'Superexpel' },
@@ -85,19 +105,23 @@ export default async function SuperexpelPage() {
           <div className="split" data-animate="fade-up">
             <div className="split__content">
               <span className="section__label">Preisgekröntes Produkt</span>
-              <h2>Superexpel – Effektiver Schutz auf natürlicher Basis</h2>
-              <p>Superexpel ist unser preisgekröntes Vergrämungsmittel auf Basis einer speziell entwickelten Rezeptur natürlicher Duftstoffe. Es vertreibt Marder, Ratten und andere Wildtiere zuverlässig – ohne Fallen, ohne Chemie, ohne Verletzungsgefahr.</p>
+              <h2>{introTitle}</h2>
+              {page?.introText ? (
+                page.introText.map((block: any, i: number) => (
+                  block._type === 'block' && block.children ? (
+                    <p key={i}>{block.children.map((c: any) => c.text).join('')}</p>
+                  ) : null
+                ))
+              ) : (
+                <p>Superexpel ist unser preisgekröntes Vergrämungsmittel auf Basis einer speziell entwickelten Rezeptur natürlicher Duftstoffe. Es vertreibt Marder, Ratten und andere Wildtiere zuverlässig – ohne Fallen, ohne Chemie, ohne Verletzungsgefahr.</p>
+              )}
               <ul className="check-list">
-                <li>Natürliche Inhaltsstoffe – sicher für Mensch und Tier</li>
-                <li>Langanhaltende Wirkung über mehrere Wochen</li>
-                <li>Einfache Anwendung ohne Fachkenntnisse</li>
-                <li>Über 20.000 erfolgreiche Anwendungen</li>
-                <li>Tierschutzkonform und unbedenklich</li>
+                {introChecklist.map((item: string, i: number) => <li key={i}>{item}</li>)}
               </ul>
             </div>
             <div className="split__image">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/marderbekaempfung.webp" alt="Superexpel Vergrämungsmittel" width="972" height="800" loading="lazy" />
+              <img src={introImageUrl} alt={introImageAlt} width="972" height="800" loading="lazy" />
             </div>
           </div>
         </div>
@@ -107,12 +131,7 @@ export default async function SuperexpelPage() {
       <section className="trust-bar">
         <div className="container">
           <div className="trust-bar__items" data-animate="fade-up">
-            {[
-              { num: 'Nr. 1', label: 'Vergrämungsmittel' },
-              { num: '20.000+', label: 'Anwendungen' },
-              { num: '100%', label: 'Natürliche Basis' },
-              { num: '4–6', label: 'Wochen Wirkung' },
-            ].map((item, i) => (
+            {stats.map((item: { num: string; label: string }, i: number) => (
               <div key={i} className="trust-bar__item">
                 <span className="trust-bar__number">{item.num}</span>
                 <span className="trust-bar__label">{item.label}</span>
@@ -127,12 +146,17 @@ export default async function SuperexpelPage() {
         <div className="container">
           <div className="section__header" data-animate="fade-up">
             <span className="section__label">Vielseitig einsetzbar</span>
-            <h2>Anwendungsbereiche</h2>
+            <h2>{usesTitle}</h2>
           </div>
           <div className="grid grid--3" data-animate="fade-up" data-animate-delay="100">
-            {USES.map((u, i) => (
+            {uses.map((u: { title: string; text: string }, i: number) => (
               <div key={i} className="service-card">
-                <div className="service-card__icon">{u.icon}</div>
+                <div className="service-card__icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="M9 12l2 2 4-4"/>
+                  </svg>
+                </div>
                 <h3>{u.title}</h3>
                 <p>{u.text}</p>
               </div>
@@ -146,10 +170,10 @@ export default async function SuperexpelPage() {
         <div className="container">
           <div className="section__header" data-animate="fade-up">
             <span className="section__label">Einfache Handhabung</span>
-            <h2>So einfach geht&apos;s</h2>
+            <h2>{processTitle}</h2>
           </div>
           <div className="process__steps" data-animate="fade-up" data-animate-delay="100">
-            {STEPS.map((step, i) => (
+            {processSteps.map((step: { num: string; title: string; text: string }, i: number) => (
               <div key={i} className="process__step">
                 <div className="process__number">{step.num}</div>
                 <h3>{step.title}</h3>
@@ -162,15 +186,15 @@ export default async function SuperexpelPage() {
 
       {/* CTA */}
       <AsvCtaBanner
-        title="Interesse an Superexpel?"
-        text="Kontaktieren Sie uns für Verfügbarkeit, Preise und persönliche Beratung."
+        title={ctaTitle}
+        text={ctaText}
         phoneFormatted={phone}
         phoneTel={phoneTel}
         ctaText="Jetzt anfragen"
       />
 
       {/* FAQ */}
-      <AsvFaq title="Häufige Fragen zu Superexpel" faqs={FAQS} />
+      <AsvFaq title={faqTitle} faqs={faqs} />
     </PageLayout>
   )
 }

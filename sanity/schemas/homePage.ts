@@ -1,0 +1,164 @@
+import { defineType, defineField } from 'sanity'
+
+export default defineType({
+  name: 'homePage',
+  title: 'Startseite',
+  type: 'document',
+  preview: {
+    prepare() {
+      return { title: 'Startseite' }
+    },
+  },
+  groups: [
+    { name: 'content', title: 'Inhalt', default: true },
+  ],
+  fields: [
+    /* ─── HERO ─── */
+    defineField({
+      name: 'heroTitle',
+      title: 'Hero-Überschrift',
+      type: 'string',
+      group: 'content',
+    }),
+    defineField({
+      name: 'heroSubtitle',
+      title: 'Hero-Untertitel',
+      type: 'string',
+      group: 'content',
+    }),
+    defineField({
+      name: 'heroImage',
+      title: 'Hero-Hintergrundbild',
+      type: 'image',
+      options: { hotspot: true },
+      fields: [
+        defineField({ name: 'alt', title: 'Alt-Text', type: 'string' }),
+      ],
+      group: 'content',
+    }),
+
+    /* ─── TRUST STATS ─── */
+    defineField({
+      name: 'trustStats',
+      title: 'Trust-Bar Statistiken (4 Zahlen)',
+      type: 'array',
+      group: 'content',
+      of: [
+        {
+          type: 'object',
+          name: 'trustStat',
+          title: 'Statistik',
+          preview: { select: { title: 'num', subtitle: 'label' } },
+          fields: [
+            defineField({ name: 'num', title: 'Zahl (z.B. "30+")', type: 'string', validation: (Rule) => Rule.required() }),
+            defineField({ name: 'label', title: 'Bezeichnung', type: 'string', validation: (Rule) => Rule.required() }),
+          ],
+        },
+      ],
+    }),
+
+    /* ─── TAUBENABWEHR TEASER ─── */
+    defineField({
+      name: 'taubenTitle',
+      title: 'Taubenabwehr-Teaser Überschrift',
+      type: 'string',
+      group: 'content',
+    }),
+    defineField({
+      name: 'taubenText',
+      title: 'Taubenabwehr-Teaser Text',
+      type: 'array',
+      of: [{ type: 'block' }],
+      group: 'content',
+    }),
+    defineField({
+      name: 'taubenImage',
+      title: 'Taubenabwehr-Teaser Bild',
+      type: 'image',
+      options: { hotspot: true },
+      fields: [
+        defineField({ name: 'alt', title: 'Alt-Text', type: 'string' }),
+      ],
+      group: 'content',
+    }),
+    defineField({
+      name: 'taubenChecklist',
+      title: 'Taubenabwehr-Teaser Checkliste',
+      type: 'array',
+      of: [{ type: 'string' }],
+      group: 'content',
+    }),
+
+    /* ─── PROZESS ─── */
+    defineField({
+      name: 'processTitle',
+      title: 'Prozess-Überschrift',
+      type: 'string',
+      group: 'content',
+    }),
+    defineField({
+      name: 'processSteps',
+      title: 'Prozess-Schritte (4 Schritte)',
+      type: 'array',
+      group: 'content',
+      of: [
+        {
+          type: 'object',
+          name: 'processStep',
+          title: 'Schritt',
+          preview: {
+            select: { num: 'num', title: 'title' },
+            prepare({ num, title }) {
+              return { title: `${num} – ${title}` }
+            },
+          },
+          fields: [
+            defineField({ name: 'num', title: 'Nummer (z.B. "01")', type: 'string', validation: (Rule) => Rule.required() }),
+            defineField({ name: 'title', title: 'Titel', type: 'string', validation: (Rule) => Rule.required() }),
+            defineField({ name: 'text', title: 'Text', type: 'text', rows: 2 }),
+          ],
+        },
+      ],
+    }),
+
+    /* ─── FAQ ─── */
+    defineField({
+      name: 'faqTitle',
+      title: 'FAQ-Überschrift',
+      type: 'string',
+      group: 'content',
+    }),
+    defineField({
+      name: 'faqs',
+      title: 'FAQ-Einträge',
+      type: 'array',
+      group: 'content',
+      of: [
+        {
+          type: 'object',
+          name: 'faq',
+          title: 'FAQ',
+          preview: { select: { title: 'question' } },
+          fields: [
+            defineField({ name: 'question', title: 'Frage', type: 'string', validation: (Rule) => Rule.required() }),
+            defineField({ name: 'answer', title: 'Antwort', type: 'text', rows: 4 }),
+          ],
+        },
+      ],
+    }),
+
+    /* ─── CTA ─── */
+    defineField({
+      name: 'ctaTitle',
+      title: 'CTA-Überschrift',
+      type: 'string',
+      group: 'content',
+    }),
+    defineField({
+      name: 'ctaText',
+      title: 'CTA-Text',
+      type: 'string',
+      group: 'content',
+    }),
+  ],
+})

@@ -10,8 +10,11 @@ interface GlobalSettings {
   companyName?: string
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface Props {
   settings?: GlobalSettings | null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  homePage?: any
 }
 
 const PESTS = [
@@ -131,9 +134,38 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
   )
 }
 
-export default function AsvHomePage({ settings }: Props) {
+export default function AsvHomePage({ settings, homePage }: Props) {
   const phone = settings?.phoneMainFormatted || '+49 6196 – 52 30 10'
   const phoneTel = settings?.phoneMainTel || '+496196523010'
+
+  const heroTitle = homePage?.heroTitle || 'Professionelle Schädlingsbekämpfung'
+  const heroSubtitle = homePage?.heroSubtitle || 'Seit über 30 Jahren schützen wir Ihr Zuhause und Ihr Unternehmen – schnell, diskret und nachhaltig wirksam.'
+  const heroBgImage = homePage?.heroImage?.asset?.url || '/images/kammerjaeger-desinfektion-kueche-scaled.webp'
+  const trustStats: { num: string; label: string }[] = homePage?.trustStats?.length ? homePage.trustStats : [
+    { num: '30+', label: 'Jahre Erfahrung' },
+    { num: '20.000+', label: 'Zufriedene Kunden' },
+    { num: '24h', label: 'Notdienst' },
+    { num: 'IHK', label: 'Zertifiziert' },
+  ]
+  const taubenTitle = homePage?.taubenTitle || 'Professionelle Taubenabwehr'
+  const taubenChecklist: string[] = homePage?.taubenChecklist?.length ? homePage.taubenChecklist : [
+    'Dauerhafte Vergrämungssysteme',
+    'Gebäudeschutz ohne optische Beeinträchtigung',
+    'Reinigung und Desinfektion von Taubenkot',
+  ]
+  const taubenImageUrl = homePage?.taubenImage?.asset?.url || '/images/schaedlingsbekaempfer.webp'
+  const taubenImageAlt = homePage?.taubenImage?.alt || 'ASV Pest Control Techniker'
+  const processTitle = homePage?.processTitle || 'So funktioniert\'s'
+  const processSteps: { num: string; title: string; text: string }[] = homePage?.processSteps?.length ? homePage.processSteps : [
+    { num: '01', title: 'Kontakt aufnehmen', text: 'Rufen Sie uns an oder nutzen Sie unser Express-Formular für eine kostenlose Erstberatung.' },
+    { num: '02', title: 'Inspektion vor Ort', text: 'Unsere Experten begutachten den Befall und erstellen einen individuellen Bekämpfungsplan.' },
+    { num: '03', title: 'Bekämpfung', text: 'Professionelle Beseitigung mit modernsten, umweltschonenden Verfahren.' },
+    { num: '04', title: 'Nachkontrolle', text: 'Wir prüfen den Erfolg und beraten Sie zu vorbeugenden Maßnahmen.' },
+  ]
+  const faqTitle = homePage?.faqTitle || 'FAQ'
+  const sanityFaqs: { question: string; answer: string }[] | null = homePage?.faqs?.length ? homePage.faqs : null
+  const ctaTitle = homePage?.ctaTitle || 'Schädlingsbefall? Wir helfen sofort.'
+  const ctaText = homePage?.ctaText || 'Fordern Sie jetzt Ihr kostenloses Express-Angebot an – unverbindlich und schnell.'
 
   return (
     <>
@@ -153,15 +185,15 @@ export default function AsvHomePage({ settings }: Props) {
       {/* ── Hero ── */}
       <section
         className="hero hero--home"
-        style={{ backgroundImage: "url('/images/kammerjaeger-desinfektion-kueche-scaled.webp')" }}
+        style={{ backgroundImage: `url('${heroBgImage}')` }}
       >
         <div className="hero__overlay" />
         <div className="container hero__container">
           <div className="hero__content" data-animate="fade-up">
             <span className="hero__badge">Ihr Schädlingsbekämpfer in der Region</span>
-            <h1 className="hero__title">Professionelle Schädlings&shy;bekämpfung</h1>
+            <h1 className="hero__title">{heroTitle}</h1>
             <p className="hero__subtitle">
-              Seit über 30 Jahren schützen wir Ihr Zuhause und Ihr Unternehmen – schnell, diskret und nachhaltig wirksam.
+              {heroSubtitle}
             </p>
             <div className="hero__actions">
               <Link href="/express-angebot" className="btn btn--primary btn--lg">Kostenloses Angebot</Link>
@@ -180,12 +212,7 @@ export default function AsvHomePage({ settings }: Props) {
       <section className="trust-bar">
         <div className="container">
           <div className="trust-bar__items" data-animate="fade-up">
-            {[
-              { num: '30+', label: 'Jahre Erfahrung' },
-              { num: '20.000+', label: 'Zufriedene Kunden' },
-              { num: '24h', label: 'Notdienst' },
-              { num: 'IHK', label: 'Zertifiziert' },
-            ].map((item, i) => (
+            {trustStats.map((item, i) => (
               <div key={i} className="trust-bar__item">
                 <span className="trust-bar__number">{item.num}</span>
                 <span className="trust-bar__label">{item.label}</span>
@@ -245,18 +272,24 @@ export default function AsvHomePage({ settings }: Props) {
           <div className="split" data-animate="fade-up">
             <div className="split__content">
               <span className="section__label">Spezialgebiet</span>
-              <h2>Professionelle Taubenabwehr</h2>
-              <p>Tauben verursachen erhebliche Schäden an Gebäuden und stellen ein Gesundheitsrisiko dar. Wir bieten maßgeschneiderte Lösungen zum Schutz Ihrer Immobilie – von Spikesystemen über Netze bis hin zu elektrischen Abwehrsystemen.</p>
+              <h2>{taubenTitle}</h2>
+              {homePage?.taubenText ? (
+                homePage.taubenText.map((block: any, i: number) => (
+                  block._type === 'block' && block.children ? (
+                    <p key={i}>{block.children.map((c: any) => c.text).join('')}</p>
+                  ) : null
+                ))
+              ) : (
+                <p>Tauben verursachen erhebliche Schäden an Gebäuden und stellen ein Gesundheitsrisiko dar. Wir bieten maßgeschneiderte Lösungen zum Schutz Ihrer Immobilie – von Spikesystemen über Netze bis hin zu elektrischen Abwehrsystemen.</p>
+              )}
               <ul className="check-list">
-                <li>Dauerhafte Vergrämungssysteme</li>
-                <li>Gebäudeschutz ohne optische Beeinträchtigung</li>
-                <li>Reinigung und Desinfektion von Taubenkot</li>
+                {taubenChecklist.map((item, i) => <li key={i}>{item}</li>)}
               </ul>
               <Link href="/taubenabwehr" className="btn btn--ghost">Mehr erfahren</Link>
             </div>
             <div className="split__image">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/schaedlingsbekaempfer.webp" alt="ASV Pest Control Techniker" width="972" height="800" loading="lazy" />
+              <img src={taubenImageUrl} alt={taubenImageAlt} width="972" height="800" loading="lazy" />
             </div>
           </div>
         </div>
@@ -267,15 +300,10 @@ export default function AsvHomePage({ settings }: Props) {
         <div className="container">
           <div className="section__header" data-animate="fade-up">
             <span className="section__label">In 4 Schritten</span>
-            <h2>So funktioniert&apos;s</h2>
+            <h2>{processTitle}</h2>
           </div>
           <div className="process__steps" data-animate="fade-up" data-animate-delay="100">
-            {[
-              { num: '01', title: 'Kontakt aufnehmen', text: 'Rufen Sie uns an oder nutzen Sie unser Express-Formular für eine kostenlose Erstberatung.' },
-              { num: '02', title: 'Inspektion vor Ort', text: 'Unsere Experten begutachten den Befall und erstellen einen individuellen Bekämpfungsplan.' },
-              { num: '03', title: 'Bekämpfung', text: 'Professionelle Beseitigung mit modernsten, umweltschonenden Verfahren.' },
-              { num: '04', title: 'Nachkontrolle', text: 'Wir prüfen den Erfolg und beraten Sie zu vorbeugenden Maßnahmen.' },
-            ].map((step, i) => (
+            {processSteps.map((step, i) => (
               <div key={i} className="process__step">
                 <div className="process__number">{step.num}</div>
                 <h3>{step.title}</h3>
@@ -348,12 +376,17 @@ export default function AsvHomePage({ settings }: Props) {
         <div className="container container--narrow">
           <div className="section__header" data-animate="fade-up">
             <span className="section__label">Häufige Fragen</span>
-            <h2>FAQ</h2>
+            <h2>{faqTitle}</h2>
           </div>
           <div className="accordion" data-animate="fade-up" data-animate-delay="100">
-            {FAQS.map((faq, i) => (
-              <FaqItem key={i} question={faq.q} answer={faq.a} />
-            ))}
+            {sanityFaqs
+              ? sanityFaqs.map((faq, i) => (
+                  <FaqItem key={i} question={faq.question} answer={faq.answer} />
+                ))
+              : FAQS.map((faq, i) => (
+                  <FaqItem key={i} question={faq.q} answer={faq.a} />
+                ))
+            }
           </div>
         </div>
       </section>
@@ -361,8 +394,8 @@ export default function AsvHomePage({ settings }: Props) {
       {/* ── CTA Banner ── */}
       <section className="cta-banner">
         <div className="container" data-animate="fade-up">
-          <h2>Schädlingsbefall? Wir helfen sofort.</h2>
-          <p>Fordern Sie jetzt Ihr kostenloses Express-Angebot an – unverbindlich und schnell.</p>
+          <h2>{ctaTitle}</h2>
+          <p>{ctaText}</p>
           <div className="cta-banner__actions">
             <Link href="/express-angebot" className="btn btn--white btn--lg">Express-Angebot anfordern</Link>
             <a href={`tel:${phoneTel}`} className="btn btn--outline-white btn--lg">

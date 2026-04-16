@@ -1,5 +1,5 @@
 import { client } from '@/sanity/lib/client'
-import { navigationQuery, footerQuery, globalSettingsQuery } from '@/sanity/lib/queries'
+import { navigationQuery, footerQuery, globalSettingsQuery, homePageQuery } from '@/sanity/lib/queries'
 import type { Metadata } from 'next'
 import PageLayout from './components/PageLayout'
 import AsvHomePage from './components/asv/AsvHomePage'
@@ -13,15 +13,17 @@ export const metadata: Metadata = {
 }
 
 export default async function HomePage() {
-  const [navigation, footer, settings] = await Promise.all([
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [navigation, footer, settings, homePage] = await Promise.all([
     client.fetch(navigationQuery),
     client.fetch(footerQuery),
     client.fetch(globalSettingsQuery),
-  ])
+    client.fetch(homePageQuery),
+  ]) as [any, any, any, any]
 
   return (
     <PageLayout navigation={navigation} footer={footer}>
-      <AsvHomePage settings={settings} />
+      <AsvHomePage settings={settings} homePage={homePage} />
     </PageLayout>
   )
 }

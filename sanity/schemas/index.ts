@@ -1,3 +1,9 @@
+import homePage from './homePage'
+import taubenabwehrPage from './taubenabwehrPage'
+import ueberUnsPage from './ueberUnsPage'
+import standortePage from './standortePage'
+import karrierePage from './karrierePage'
+import superexpelPage from './superexpelPage'
 import menuCategory from './menuCategory'
 import sideCategory from './sideCategory'
 import openingHours from './openingHours'
@@ -37,6 +43,12 @@ import videoModule from './modules/videoModule'
 
 export const schemaTypes = [
   // ASV Pest Control – Custom Schemas
+  homePage,
+  taubenabwehrPage,
+  ueberUnsPage,
+  standortePage,
+  karrierePage,
+  superexpelPage,
   schaedlingsseite,
   stadtseite,
 

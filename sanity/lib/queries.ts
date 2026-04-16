@@ -603,6 +603,97 @@ export const allPagesQuery = `*[_type == "page"] {
   slug { current }
 }`
 
+/* ═══ ASV SEITEN ═══ */
+
+export const homePageQuery = `*[_type == "homePage"][0] {
+  heroTitle,
+  heroSubtitle,
+  heroImage { asset->{ url }, alt },
+  trustStats[] { num, label },
+  taubenTitle,
+  taubenText,
+  taubenImage { asset->{ url }, alt },
+  taubenChecklist,
+  processTitle,
+  processSteps[] { num, title, text },
+  faqTitle,
+  faqs[] { question, answer },
+  ctaTitle,
+  ctaText
+}`
+
+export const taubenabwehrPageQuery = `*[_type == "taubenabwehrPage"][0] {
+  heroImage { asset->{ url }, alt },
+  heroSubtitle,
+  introTitle,
+  introText,
+  services[] { title, description },
+  splitTitle,
+  splitText,
+  splitImage { asset->{ url }, alt },
+  splitChecklist,
+  processTitle,
+  processSteps[] { num, title, text },
+  faqTitle,
+  faqs[] { question, answer },
+  ctaTitle,
+  ctaText
+}`
+
+export const ueberUnsPageQuery = `*[_type == "ueberUnsPage"][0] {
+  heroSubtitle,
+  storyTitle,
+  storyText,
+  storyImage { asset->{ url }, alt },
+  stats[] { num, label },
+  valuesTitle,
+  values[] { title, text },
+  certifications,
+  ctaTitle,
+  ctaText
+}`
+
+export const standortePageQuery = `*[_type == "standortePage"][0] {
+  heroSubtitle,
+  introText,
+  locations[] { name, address, phone, phoneTel, description, hours },
+  hotlineTitle,
+  hotlineText,
+  ctaTitle,
+  ctaText
+}`
+
+export const karrierePageQuery = `*[_type == "karrierePage"][0] {
+  heroSubtitle,
+  introTitle,
+  introText,
+  benefitsTitle,
+  benefits[] { title, text },
+  jobsTitle,
+  jobs[] { title, type, location, description, requirements },
+  initiativeTitle,
+  initiativeText,
+  ctaTitle,
+  ctaText
+}`
+
+export const superexpelPageQuery = `*[_type == "superexpelPage"][0] {
+  heroSubtitle,
+  introTitle,
+  introText,
+  introImage { asset->{ url }, alt },
+  introChecklist,
+  stats[] { num, label },
+  usesTitle,
+  uses[] { title, text },
+  processTitle,
+  processSteps[] { num, title, text },
+  faqTitle,
+  faqs[] { question, answer },
+  ctaTitle,
+  ctaText
+}`
+
 export const analyticsEventsQuery = `*[_type == "analyticsEvents"][0] {
   trackCtaClicks,
   ctaEventName,

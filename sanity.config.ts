@@ -53,6 +53,57 @@ const structure = (S: StructureBuilder) =>
         ),
       S.divider(),
 
+      // ── ASV Seiten ─────────────────────────────────────────
+      S.listItem()
+        .title('Startseite')
+        .icon(() => '🏠')
+        .child(
+          S.document()
+            .schemaType('homePage')
+            .documentId('homePage')
+        ),
+      S.listItem()
+        .title('Taubenabwehr')
+        .icon(() => '🐦')
+        .child(
+          S.document()
+            .schemaType('taubenabwehrPage')
+            .documentId('taubenabwehrPage')
+        ),
+      S.listItem()
+        .title('Über uns')
+        .icon(() => '🏢')
+        .child(
+          S.document()
+            .schemaType('ueberUnsPage')
+            .documentId('ueberUnsPage')
+        ),
+      S.listItem()
+        .title('Standorte')
+        .icon(() => '📍')
+        .child(
+          S.document()
+            .schemaType('standortePage')
+            .documentId('standortePage')
+        ),
+      S.listItem()
+        .title('Karriere')
+        .icon(() => '💼')
+        .child(
+          S.document()
+            .schemaType('karrierePage')
+            .documentId('karrierePage')
+        ),
+      S.listItem()
+        .title('Superexpel')
+        .icon(() => '🧪')
+        .child(
+          S.document()
+            .schemaType('superexpelPage')
+            .documentId('superexpelPage')
+        ),
+      S.divider(),
+
       // ── ASV Hauptinhalte ───────────────────────────────────
       S.listItem()
         .title('Schädlingsseiten')
