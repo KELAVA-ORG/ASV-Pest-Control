@@ -17,6 +17,7 @@ export default defineType({
     { name: 'buttons', title: '🔘 Buttons', options: { collapsible: true, collapsed: false } },
     { name: 'design', title: '🎨 Design', options: { collapsible: true, collapsed: true } },
     { name: 'privacy', title: '🔗 Datenschutz-Link', options: { collapsible: true, collapsed: true } },
+    { name: 'categories', title: '🍪 Cookie-Kategorien', options: { collapsible: true, collapsed: false } },
     { name: 'revoke', title: '🔄 Widerruf / Opt-Out', options: { collapsible: true, collapsed: true } },
   ],
   fields: [
@@ -156,6 +157,28 @@ export default defineType({
       fieldset: 'buttons',
       hidden: ({ parent }) => parent?.consentMode !== 'built-in',
     }),
+    defineField({
+      name: 'settingsEnabled',
+      title: '"Einstellungen" Button anzeigen',
+      description: 'Zeigt den Button der granulare Cookie-Kategorien aufklappt',
+      type: 'boolean',
+      initialValue: true,
+      fieldset: 'buttons',
+    }),
+    defineField({
+      name: 'settingsButtonText',
+      title: '"Einstellungen" Button Text',
+      type: 'string',
+      initialValue: 'Einstellungen',
+      fieldset: 'buttons',
+    }),
+    defineField({
+      name: 'saveSelectionText',
+      title: '"Auswahl speichern" Button Text',
+      type: 'string',
+      initialValue: 'Auswahl speichern',
+      fieldset: 'buttons',
+    }),
 
     /* ═══ DATENSCHUTZ-LINK ═══ */
     defineField({
@@ -207,6 +230,64 @@ export default defineType({
       options: { disableAlpha: true },
       fieldset: 'design',
       hidden: ({ parent }) => parent?.consentMode !== 'built-in',
+    }),
+
+    /* ═══ COOKIE-KATEGORIEN ═══ */
+    defineField({
+      name: 'necessaryName',
+      title: 'Notwendig – Name',
+      type: 'string',
+      initialValue: 'Notwendig',
+      fieldset: 'categories',
+    }),
+    defineField({
+      name: 'necessaryDesc',
+      title: 'Notwendig – Beschreibung',
+      type: 'string',
+      initialValue: 'Diese Cookies sind für die Grundfunktionen der Website erforderlich (z.\u202fB. Speicherung Ihrer Cookie-Einstellungen).',
+      fieldset: 'categories',
+    }),
+    defineField({
+      name: 'analyticsEnabled',
+      title: 'Kategorie "Analyse & Statistiken" anzeigen',
+      type: 'boolean',
+      initialValue: true,
+      fieldset: 'categories',
+    }),
+    defineField({
+      name: 'analyticsName',
+      title: 'Analyse – Name',
+      type: 'string',
+      initialValue: 'Analyse & Statistiken',
+      fieldset: 'categories',
+    }),
+    defineField({
+      name: 'analyticsDesc',
+      title: 'Analyse – Beschreibung',
+      type: 'string',
+      initialValue: 'Diese Cookies helfen uns zu verstehen, wie Besucher unsere Website nutzen (z.\u202fB. Google Analytics).',
+      fieldset: 'categories',
+    }),
+    defineField({
+      name: 'marketingEnabled',
+      title: 'Kategorie "Marketing" anzeigen',
+      type: 'boolean',
+      initialValue: true,
+      fieldset: 'categories',
+    }),
+    defineField({
+      name: 'marketingName',
+      title: 'Marketing – Name',
+      type: 'string',
+      initialValue: 'Marketing',
+      fieldset: 'categories',
+    }),
+    defineField({
+      name: 'marketingDesc',
+      title: 'Marketing – Beschreibung',
+      type: 'string',
+      initialValue: 'Diese Cookies werden verwendet, um Werbung relevanter für Sie zu gestalten (z.\u202fB. Google Ads Conversion-Tracking).',
+      fieldset: 'categories',
     }),
 
     /* ═══ WIDERRUF / OPT-OUT ═══ */

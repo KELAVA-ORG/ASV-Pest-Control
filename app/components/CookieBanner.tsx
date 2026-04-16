@@ -6,7 +6,7 @@ import Link from 'next/link'
 /* ─── Types ─── */
 interface CookieConsentData {
   consentMode?: string
-  // Built-in banner
+  // Banner content
   heading?: string
   text?: string
   acceptAllText?: string
@@ -16,31 +16,48 @@ interface CookieConsentData {
   position?: string
   bgColor?: { hex?: string }
   textColor?: { hex?: string }
-  // Revoke
-  revokeEnabled?: boolean
-  revokeText?: string
-  revokePosition?: string
-  // Tracking IDs (needed for consent-based loading)
+  // Settings panel
+  settingsEnabled?: boolean
+  settingsButtonText?: string
+  saveSelectionText?: string
+  // Categories
+  necessaryName?: string
+  necessaryDesc?: string
+  analyticsEnabled?: boolean
+  analyticsName?: string
+  analyticsDesc?: string
+  marketingEnabled?: boolean
+  marketingName?: string
+  marketingDesc?: string
+  // Tracking IDs
   gaId?: string
   gtagManagerId?: string
   fbPixelId?: string
   gadsConversionId?: string
-  // Custom code
   consentRequiredHeadCode?: string
+  // Revoke
+  revokeEnabled?: boolean
+  revokeText?: string
+  revokePosition?: string
 }
 
-type ConsentState = 'all' | 'essential' | null
+interface GranularConsent {
+  analytics: boolean
+  marketing: boolean
+}
 
-const CONSENT_KEY = 'cookie-consent'
+const CONSENT_KEY = 'cc-consent-v2'
 
-/* ─── Consent helpers ─── */
-function getConsent(): ConsentState {
+function getStoredConsent(): GranularConsent | null {
   if (typeof window === 'undefined') return null
-  return localStorage.getItem(CONSENT_KEY) as ConsentState
+  try {
+    const raw = localStorage.getItem(CONSENT_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch { return null }
 }
 
-function setConsent(value: 'all' | 'essential') {
-  localStorage.setItem(CONSENT_KEY, value)
+function storeConsent(consent: GranularConsent) {
+  localStorage.setItem(CONSENT_KEY, JSON.stringify(consent))
 }
 
 function clearConsent() {
@@ -56,12 +73,9 @@ function loadGA4(gaId: string) {
   document.head.appendChild(s)
 
   window.dataLayer = window.dataLayer || []
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function gtag(...args: any[]) { window.dataLayer!.push(args) }
-  window.gtag = gtag as typeof window.gtag
-  gtag('js', new Date())
-  gtag('consent', 'update', { analytics_storage: 'granted', ad_storage: 'granted' })
-  gtag('config', gaId)
+  if (!window.gtag) window.gtag = gtagPush
+  window.gtag!('js', new Date())
+  window.gtag!('config', gaId)
 }
 
 function loadGTM(gtmId: string) {
@@ -82,42 +96,52 @@ function loadFBPixel(pixelId: string) {
   document.head.appendChild(s)
 }
 
-function loadConsentScripts(data: CookieConsentData) {
+function loadAnalyticsScripts(data: CookieConsentData) {
   if (data.gaId) loadGA4(data.gaId)
   if (data.gtagManagerId) loadGTM(data.gtagManagerId)
-  if (data.fbPixelId) loadFBPixel(data.fbPixelId)
-  if (data.gadsConversionId && window.gtag) {
-    window.gtag('config', data.gadsConversionId)
-  }
   if (data.consentRequiredHeadCode) {
-    const s = document.createElement('script')
-    s.textContent = data.consentRequiredHeadCode
-    document.head.appendChild(s)
+    if (!document.querySelector('script[data-consent-required]')) {
+      const s = document.createElement('script')
+      s.setAttribute('data-consent-required', 'true')
+      s.textContent = data.consentRequiredHeadCode
+      document.head.appendChild(s)
+    }
   }
 }
 
-/* ─── Update Google Consent Mode v2 ─── */
-function updateGoogleConsent(granted: boolean) {
-  window.dataLayer = window.dataLayer || []
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function gtag(...args: any[]) { window.dataLayer!.push(args) }
-  if (!window.gtag) window.gtag = gtag
+function loadMarketingScripts(data: CookieConsentData) {
+  if (data.fbPixelId) loadFBPixel(data.fbPixelId)
+  if (data.gadsConversionId && window.gtag) window.gtag('config', data.gadsConversionId)
+}
 
-  if (granted) {
-    window.gtag('consent', 'update', {
-      analytics_storage: 'granted',
-      ad_storage: 'granted',
-      ad_user_data: 'granted',
-      ad_personalization: 'granted',
-    })
-  } else {
-    window.gtag('consent', 'update', {
-      analytics_storage: 'denied',
-      ad_storage: 'denied',
-      ad_user_data: 'denied',
-      ad_personalization: 'denied',
-    })
-  }
+/* ─── Google Consent Mode v2 (granular) ─── */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function gtagPush(...args: any[]) { window.dataLayer!.push(args) }
+
+function ensureGtag() {
+  window.dataLayer = window.dataLayer || []
+  if (!window.gtag) window.gtag = gtagPush
+}
+
+function initGoogleConsentDefaults() {
+  ensureGtag()
+  window.gtag!('consent', 'default', {
+    analytics_storage: 'denied',
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    wait_for_update: 500,
+  })
+}
+
+function updateGoogleConsent(analytics: boolean, marketing: boolean) {
+  ensureGtag()
+  window.gtag!('consent', 'update', {
+    analytics_storage: analytics ? 'granted' : 'denied',
+    ad_storage: marketing ? 'granted' : 'denied',
+    ad_user_data: marketing ? 'granted' : 'denied',
+    ad_personalization: marketing ? 'granted' : 'denied',
+  })
 }
 
 /* ═══════════════════════════════════════════════════
@@ -125,37 +149,28 @@ function gtag(...args: any[]) { window.dataLayer!.push(args) }
    ═══════════════════════════════════════════════════ */
 export default function CookieBanner({ data }: { data: CookieConsentData | null }) {
   const [bannerVisible, setBannerVisible] = useState(false)
-  const [consent, setConsentState] = useState<ConsentState>(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [analyticsChecked, setAnalyticsChecked] = useState(false)
+  const [marketingChecked, setMarketingChecked] = useState(false)
   const [mounted, setMounted] = useState(false)
 
-  // Initialize consent defaults on mount
   useEffect(() => {
     setMounted(true)
     if (!data || data.consentMode === 'disabled') return
 
     // Set Google Consent Mode v2 defaults FIRST (before any scripts)
-    window.dataLayer = window.dataLayer || []
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function gtag(...args: any[]) { window.dataLayer!.push(args) }
-    if (!window.gtag) window.gtag = gtag
-    window.gtag('consent', 'default', {
-      analytics_storage: 'denied',
-      ad_storage: 'denied',
-      ad_user_data: 'denied',
-      ad_personalization: 'denied',
-      wait_for_update: 500,
-    })
+    initGoogleConsentDefaults()
 
     // Check existing consent
-    const existing = getConsent()
-    setConsentState(existing)
+    const existing = getStoredConsent()
 
-    if (existing === 'all') {
-      // User previously accepted all → load scripts
-      updateGoogleConsent(true)
-      loadConsentScripts(data)
-    } else if (existing === 'essential') {
-      updateGoogleConsent(false)
+    if (existing !== null) {
+      // Restore previous choices to checkboxes
+      setAnalyticsChecked(existing.analytics)
+      setMarketingChecked(existing.marketing)
+      updateGoogleConsent(existing.analytics, existing.marketing)
+      if (existing.analytics && data) loadAnalyticsScripts(data)
+      if (existing.marketing && data) loadMarketingScripts(data)
     } else if (data.consentMode === 'built-in') {
       // No consent yet → show banner
       setBannerVisible(true)
@@ -163,23 +178,42 @@ function gtag(...args: any[]) { window.dataLayer!.push(args) }
   }, [data])
 
   const handleAcceptAll = useCallback(() => {
-    setConsent('all')
-    setConsentState('all')
+    storeConsent({ analytics: true, marketing: true })
+    setAnalyticsChecked(true)
+    setMarketingChecked(true)
     setBannerVisible(false)
-    updateGoogleConsent(true)
-    if (data) loadConsentScripts(data)
+    setSettingsOpen(false)
+    updateGoogleConsent(true, true)
+    if (data) {
+      loadAnalyticsScripts(data)
+      loadMarketingScripts(data)
+    }
   }, [data])
 
-  const handleAcceptEssential = useCallback(() => {
-    setConsent('essential')
-    setConsentState('essential')
+  const handleRejectAll = useCallback(() => {
+    storeConsent({ analytics: false, marketing: false })
+    setAnalyticsChecked(false)
+    setMarketingChecked(false)
     setBannerVisible(false)
-    updateGoogleConsent(false)
+    setSettingsOpen(false)
+    updateGoogleConsent(false, false)
   }, [])
+
+  const handleSaveSelection = useCallback(() => {
+    storeConsent({ analytics: analyticsChecked, marketing: marketingChecked })
+    setBannerVisible(false)
+    setSettingsOpen(false)
+    updateGoogleConsent(analyticsChecked, marketingChecked)
+    if (data) {
+      if (analyticsChecked) loadAnalyticsScripts(data)
+      if (marketingChecked) loadMarketingScripts(data)
+    }
+  }, [analyticsChecked, marketingChecked, data])
 
   const handleRevoke = useCallback(() => {
     clearConsent()
-    setConsentState(null)
+    setAnalyticsChecked(false)
+    setMarketingChecked(false)
     setBannerVisible(true)
   }, [])
 
@@ -187,47 +221,121 @@ function gtag(...args: any[]) { window.dataLayer!.push(args) }
   if (!mounted || !data) return null
   if (data.consentMode !== 'built-in') return null
 
-  const posClass = data.position === 'bottom-left'
-    ? 'cookie-banner--left'
-    : data.position === 'bottom-right'
-      ? 'cookie-banner--right'
-      : data.position === 'center'
-        ? 'cookie-banner--center'
-        : ''
-
   const style: React.CSSProperties = {}
   if (data.bgColor?.hex) style.backgroundColor = data.bgColor.hex
   if (data.textColor?.hex) style.color = data.textColor.hex
 
   return (
     <>
-      {/* ─── Cookie Banner ─── */}
       {bannerVisible && (
-        <div className={`cookie-banner ${posClass}`} style={style} role="dialog" aria-label="Cookie-Einstellungen">
-          <div className="cookie-banner__inner">
-            <div className="cookie-banner__content">
-              {data.heading && <p className="cookie-banner__heading">{data.heading}</p>}
-              {data.text && <p className="cookie-banner__text">{data.text}</p>}
-              {data.privacyLinkUrl && (
-                <Link href={data.privacyLinkUrl} className="cookie-banner__link">
-                  {data.privacyLinkText || 'Datenschutzerklärung'}
-                </Link>
-              )}
+        <div
+          className="cc-banner cc-banner--visible"
+          id="cookieBanner"
+          role="dialog"
+          aria-label="Cookie-Einstellungen"
+          style={Object.keys(style).length > 0 ? style : undefined}
+        >
+          <div className="cc-banner__inner">
+            <div className="cc-banner__content">
+              <p className="cc-banner__text">
+                {data.text || 'Wir verwenden Cookies, um Ihnen die bestmögliche Erfahrung auf unserer Website zu bieten.'}{' '}
+                {data.privacyLinkUrl && (
+                  <Link href={data.privacyLinkUrl} className="cc-banner__link">
+                    {data.privacyLinkText || 'Datenschutzerklärung'}
+                  </Link>
+                )}.
+              </p>
             </div>
-            <div className="cookie-banner__actions">
-              <button onClick={handleAcceptAll} className="cookie-banner__btn cookie-banner__btn--accept">
-                {data.acceptAllText || 'Alle akzeptieren'}
-              </button>
-              <button onClick={handleAcceptEssential} className="cookie-banner__btn cookie-banner__btn--essential">
+            <div className="cc-banner__actions">
+              <button onClick={handleRejectAll} className="btn btn--outline cc-banner__btn">
                 {data.acceptEssentialText || 'Nur notwendige'}
               </button>
+              <button onClick={handleAcceptAll} className="btn btn--primary cc-banner__btn">
+                {data.acceptAllText || 'Alle akzeptieren'}
+              </button>
+              {data.settingsEnabled !== false && (
+                <button
+                  onClick={() => setSettingsOpen(o => !o)}
+                  className="cc-banner__settings-toggle"
+                  aria-expanded={settingsOpen}
+                >
+                  {settingsOpen ? 'Weniger' : (data.settingsButtonText || 'Einstellungen')}
+                </button>
+              )}
             </div>
           </div>
+
+          {/* Granular settings panel */}
+          {settingsOpen && (
+            <div className="cc-settings" id="ccSettings">
+              <div className="cc-settings__inner">
+                {/* Notwendig – always active */}
+                <div className="cc-settings__group">
+                  <div className="cc-settings__header">
+                    <label className="cc-settings__label">
+                      <input type="checkbox" checked readOnly disabled />
+                      <span className="cc-settings__name">{data.necessaryName || 'Notwendig'}</span>
+                    </label>
+                    <span className="cc-settings__badge">Immer aktiv</span>
+                  </div>
+                  <p className="cc-settings__desc">
+                    {data.necessaryDesc || 'Diese Cookies sind für die Grundfunktionen der Website erforderlich.'}
+                  </p>
+                </div>
+
+                {/* Analytics */}
+                {data.analyticsEnabled !== false && (
+                  <div className="cc-settings__group">
+                    <div className="cc-settings__header">
+                      <label className="cc-settings__label">
+                        <input
+                          type="checkbox"
+                          id="ccAnalytics"
+                          checked={analyticsChecked}
+                          onChange={e => setAnalyticsChecked(e.target.checked)}
+                        />
+                        <span className="cc-settings__name">{data.analyticsName || 'Analyse & Statistiken'}</span>
+                      </label>
+                    </div>
+                    <p className="cc-settings__desc">
+                      {data.analyticsDesc || 'Diese Cookies helfen uns zu verstehen, wie Besucher unsere Website nutzen.'}
+                    </p>
+                  </div>
+                )}
+
+                {/* Marketing */}
+                {data.marketingEnabled !== false && (
+                  <div className="cc-settings__group">
+                    <div className="cc-settings__header">
+                      <label className="cc-settings__label">
+                        <input
+                          type="checkbox"
+                          id="ccMarketing"
+                          checked={marketingChecked}
+                          onChange={e => setMarketingChecked(e.target.checked)}
+                        />
+                        <span className="cc-settings__name">{data.marketingName || 'Marketing'}</span>
+                      </label>
+                    </div>
+                    <p className="cc-settings__desc">
+                      {data.marketingDesc || 'Diese Cookies werden verwendet, um Werbung relevanter für Sie zu gestalten.'}
+                    </p>
+                  </div>
+                )}
+
+                <div className="cc-settings__actions">
+                  <button onClick={handleSaveSelection} className="btn btn--primary cc-banner__btn">
+                    {data.saveSelectionText || 'Auswahl speichern'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
-      {/* ─── Revoke/Opt-Out Button ─── */}
-      {!bannerVisible && data.revokeEnabled && consent !== null && (
+      {/* Revoke button */}
+      {!bannerVisible && data.revokeEnabled && (
         <button
           className={`cookie-revoke ${data.revokePosition === 'bottom-right' ? 'cookie-revoke--right' : 'cookie-revoke--left'}`}
           onClick={handleRevoke}
