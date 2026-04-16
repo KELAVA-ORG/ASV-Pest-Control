@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./asv.css";
 import { client } from "@/sanity/lib/client";
-import { globalSettingsQuery, cookieConsentQuery, announcementBarQuery, analyticsEventsQuery } from "@/sanity/lib/queries";
+import { globalSettingsQuery, cookieConsentQuery, announcementBarQuery, analyticsEventsQuery, scrollCtaQuery } from "@/sanity/lib/queries";
+import ScrollCtaOverlay from "./components/ScrollCtaOverlay";
 import CookieBanner from "./components/CookieBanner";
 import AnnouncementBar from "./components/AnnouncementBar";
 import BackToTop from "./components/BackToTop";
@@ -36,6 +37,8 @@ interface GlobalSettings {
   backToTopSize?: number;
   backToTopPosition?: string;
   backToTopStyle?: string;
+  phoneMainFormatted?: string;
+  phoneMainTel?: string;
 }
 
 interface CookieConsentSettings {
@@ -82,12 +85,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [settings, consentData, announcementData, analyticsConfig] = await Promise.all([
+  const [settings, consentData, announcementData, analyticsConfig, scrollCtaData] = await Promise.all([
     client.fetch(globalSettingsQuery),
     client.fetch(cookieConsentQuery),
     client.fetch(announcementBarQuery),
     client.fetch(analyticsEventsQuery),
-  ]) as [GlobalSettings | null, CookieConsentSettings | null, Record<string, unknown> | null, Record<string, unknown> | null];
+    client.fetch(scrollCtaQuery),
+  ]) as [GlobalSettings | null, CookieConsentSettings | null, Record<string, unknown> | null, Record<string, unknown> | null, Record<string, unknown> | null];
 
   // CSS-Variablen aus Backend-Farben
   const cssVars: string[] = [];
@@ -204,6 +208,12 @@ export default async function RootLayout({
             shape={settings?.backToTopStyle}
           />
         )}
+
+        <ScrollCtaOverlay
+          settings={scrollCtaData as Parameters<typeof ScrollCtaOverlay>[0]['settings']}
+          phoneMain={settings?.phoneMainFormatted}
+          phoneTel={settings?.phoneMainTel}
+        />
 
         {/* Analytics Event Tracking */}
         <AnalyticsTracker config={analyticsConfig} />

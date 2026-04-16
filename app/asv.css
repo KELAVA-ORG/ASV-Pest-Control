@@ -2393,7 +2393,7 @@ p:last-child {
     right: -420px;
     z-index: 997;
     width: 360px;
-    background: #fff;
+    background: var(--scta-bg, #fff);
     border-radius: 16px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
     padding: 24px;
@@ -2460,14 +2460,14 @@ p:last-child {
     font-family: var(--font-heading);
     font-size: 20px;
     font-weight: 800;
-    color: var(--gray-900);
+    color: var(--scta-title, var(--gray-900));
     margin: 0 0 6px 0;
     line-height: 1.3;
   }
 
   .scroll-cta__text {
     font-size: 14px;
-    color: var(--gray-500);
+    color: var(--scta-text, var(--gray-500));
     margin: 0 0 16px 0;
     line-height: 1.5;
   }
@@ -2506,8 +2506,8 @@ p:last-child {
   }
 
   .scroll-cta__btn--primary {
-    background: var(--gray-100);
-    color: var(--gray-700);
+    background: var(--scta-btn-bg, var(--gray-100));
+    color: var(--scta-btn-text, var(--gray-700));
     border: 1px solid var(--gray-200);
   }
 

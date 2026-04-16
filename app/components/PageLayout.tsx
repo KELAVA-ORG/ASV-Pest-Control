@@ -191,17 +191,40 @@ export default function PageLayout({ navigation: nav, footer: foot, blogBasePath
     const scrollCta = document.getElementById('scrollCta')
     const scrollCtaClose = document.getElementById('scrollCtaClose')
     let scrollCtaDismissed = false
+
     if (scrollCta) {
-      function checkScrollCta() {
-        if (scrollCtaDismissed) return
-        const scrolled = window.scrollY / (document.body.scrollHeight - window.innerHeight)
-        scrollCta?.classList.toggle('scroll-cta--visible', scrolled > 0.4)
+      const triggerFraction = parseFloat(scrollCta.dataset.trigger || '40') / 100
+      const pagesAttr = scrollCta.dataset.pages
+
+      // Check page filter
+      let shouldActivate = true
+      if (pagesAttr) {
+        try {
+          const config = JSON.parse(pagesAttr) as { mode: string; pages: string[] }
+          const currentPath = window.location.pathname
+          const matches = config.pages.some(p =>
+            p.endsWith('/') && p !== '/'
+              ? currentPath.startsWith(p)
+              : currentPath === p
+          )
+          shouldActivate = config.mode === 'specific' ? matches : !matches
+        } catch { /* ignore parse errors */ }
       }
-      window.addEventListener('scroll', checkScrollCta, { passive: true })
-      scrollCtaClose?.addEventListener('click', () => {
-        scrollCtaDismissed = true
-        scrollCta?.classList.remove('scroll-cta--visible')
-      })
+
+      if (shouldActivate) {
+        const handleScrollCta = () => {
+          if (scrollCtaDismissed) return
+          const scrollable = document.documentElement.scrollHeight - window.innerHeight
+          if (scrollable <= 0) return
+          const scrolled = window.scrollY / scrollable
+          scrollCta.classList.toggle('scroll-cta--visible', scrolled > triggerFraction)
+        }
+        window.addEventListener('scroll', handleScrollCta, { passive: true })
+        scrollCtaClose?.addEventListener('click', () => {
+          scrollCtaDismissed = true
+          scrollCta.classList.remove('scroll-cta--visible')
+        })
+      }
     }
 
     return () => {
@@ -464,38 +487,6 @@ export default function PageLayout({ navigation: nav, footer: foot, blogBasePath
         </div>
       </div>
 
-      {/* ══════════════ SCROLL-TRIGGERED SLIDE-IN CTA ══════════════ */}
-      <div className="scroll-cta" id="scrollCta" role="dialog" aria-label="Kontakt-Angebot">
-        <button className="scroll-cta__close" id="scrollCtaClose" aria-label="Schließen">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-        <div className="scroll-cta__badge">
-          <span className="scroll-cta__badge-dot"></span>
-          <span>Wir sind gerade erreichbar</span>
-        </div>
-        <h3 className="scroll-cta__title">Schädlingsproblem?</h3>
-        <p className="scroll-cta__text">Kostenlose Erstberatung &amp; Express-Angebot innerhalb von 24h.</p>
-        <div className="scroll-cta__actions">
-          <a href={`tel:${phoneTel}`} className="scroll-cta__btn scroll-cta__btn--phone">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
-            </svg>
-            {phoneMain}
-          </a>
-          <a href="/express-angebot" className="scroll-cta__btn scroll-cta__btn--primary">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-              <polyline points="10 9 9 9 8 9"/>
-            </svg>
-            Express-Angebot
-          </a>
-        </div>
-      </div>
     </>
   )
 }

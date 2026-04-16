@@ -51,6 +51,14 @@ const structure = (S: StructureBuilder) =>
             .schemaType('cookieConsent')
             .documentId('cookieConsent')
         ),
+      S.listItem()
+        .title('Scroll-CTA (Slide-in Banner)')
+        .icon(() => '💬')
+        .child(
+          S.document()
+            .schemaType('scrollCtaSettings')
+            .documentId('scrollCtaSettings')
+        ),
       S.divider(),
 
       // ── ASV Seiten ─────────────────────────────────────────

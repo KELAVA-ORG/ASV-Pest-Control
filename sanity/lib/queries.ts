@@ -717,3 +717,21 @@ export const analyticsEventsQuery = `*[_type == "analyticsEvents"][0] {
     params[] { key, value }
   }
 }`
+
+export const scrollCtaQuery = `*[_type == "scrollCtaSettings"][0] {
+  enabled,
+  scrollTriggerPercent,
+  showOnPages,
+  specificPages,
+  badgeText,
+  title,
+  text,
+  phoneButtonLabel,
+  ctaButtonText,
+  ctaButtonLink,
+  bgColor,
+  titleColor,
+  textColor,
+  primaryBtnBg,
+  primaryBtnText
+}`
