@@ -654,6 +654,11 @@ p:last-child {
   margin-top: var(--space-4);
 }
 
+.footer__logo {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
 .footer__logo img {
   max-height: 40px;
   width: auto;
