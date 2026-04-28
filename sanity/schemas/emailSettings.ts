@@ -4,7 +4,6 @@ export default defineType({
   name: 'emailSettings',
   title: 'E-Mail Einstellungen',
   type: 'document',
-  __experimental_actions: ['update', 'publish'],
   groups: [
     { name: 'absender', title: 'Absender' },
     { name: 'empfaenger', title: 'Empfänger' },
