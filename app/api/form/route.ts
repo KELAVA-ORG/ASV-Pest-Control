@@ -1,5 +1,13 @@
 import { NextResponse } from 'next/server'
 import { writeClient } from '@/sanity/lib/writeClient'
+import { client } from '@/sanity/lib/client'
+
+const emailSettingsQuery = `*[_type == "emailSettings"][0] {
+  fromName, fromEmail, replyToEmail,
+  defaultRecipients, ccRecipients,
+  notificationSubject,
+  autoresponderEnabled, autoresponderSubject, autoresponderMessage
+}`
 
 interface SubmissionField {
   label: string
@@ -88,9 +96,17 @@ export async function POST(request: Request) {
 
     // 2. Send notification email
     const resendKey = process.env.RESEND_API_KEY
-    if (resendKey && body.emailTo?.length) {
+    const emailCfg = resendKey ? await client.fetch(emailSettingsQuery).catch(() => null) : null
+
+    // Merge form config with Sanity email settings (form config takes priority)
+    const recipients = body.emailTo?.length ? body.emailTo : (emailCfg?.defaultRecipients || [])
+    const fromAddress = emailCfg?.fromEmail
+      ? `${emailCfg.fromName || 'ASV Pest Control'} <${emailCfg.fromEmail}>`
+      : (process.env.RESEND_FROM_EMAIL || 'ASV Pest Control <onboarding@resend.dev>')
+
+    if (resendKey && recipients.length) {
       // Replace placeholders in subject
-      let subject = body.emailSubject || `Neue Anfrage: ${body.formName}`
+      let subject = body.emailSubject || emailCfg?.notificationSubject || `Neue Anfrage: ${body.formName}`
       subject = subject.replace(/\{\{_formName\}\}/g, body.formName)
       body.fields.forEach((f) => {
         subject = subject.replace(new RegExp(`\\{\\{${escapeRegex(f.label)}\\}\\}`, 'gi'), f.value)
@@ -131,6 +147,7 @@ export async function POST(request: Request) {
       }
 
       try {
+        const ccList = [...(body.emailCc || []), ...(emailCfg?.ccRecipients || [])]
         await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
@@ -138,11 +155,11 @@ export async function POST(request: Request) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: process.env.RESEND_FROM_EMAIL || 'Formular <onboarding@resend.dev>',
-            to: body.emailTo,
-            cc: body.emailCc?.length ? body.emailCc : undefined,
+            from: fromAddress,
+            to: recipients,
+            cc: ccList.length ? ccList : undefined,
             bcc: body.emailBcc?.length ? body.emailBcc : undefined,
-            reply_to: replyTo,
+            reply_to: replyTo || emailCfg?.replyToEmail || undefined,
             subject,
             html: htmlContent,
             text: textContent,
@@ -153,12 +170,13 @@ export async function POST(request: Request) {
       }
 
       // 3. Auto-responder
-      if (body.autoresponderEnabled && body.autoresponderEmailField) {
+      const autoEnabled = body.autoresponderEnabled ?? emailCfg?.autoresponderEnabled
+      if (autoEnabled && body.autoresponderEmailField) {
         const recipientField = body.fields.find((f) =>
           f.label.toLowerCase() === body.autoresponderEmailField!.toLowerCase()
         )
         if (recipientField?.value) {
-          let autoMessage = body.autoresponderMessage || 'Vielen Dank für Ihre Nachricht.'
+          let autoMessage = body.autoresponderMessage || emailCfg?.autoresponderMessage || 'Vielen Dank für Ihre Nachricht.'
           // Replace placeholders
           body.fields.forEach((f) => {
             autoMessage = autoMessage.replace(
@@ -175,9 +193,9 @@ export async function POST(request: Request) {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                from: process.env.RESEND_FROM_EMAIL || 'Formular <onboarding@resend.dev>',
+                from: fromAddress,
                 to: [recipientField.value],
-                subject: body.autoresponderSubject || 'Vielen Dank für Ihre Anfrage',
+                subject: body.autoresponderSubject || emailCfg?.autoresponderSubject || 'Vielen Dank für Ihre Anfrage – ASV Pest Control',
                 html: `<div style="font-family:sans-serif;max-width:600px;">${escapeHtml(autoMessage).replace(/\n/g, '<br>')}</div>`,
                 text: autoMessage,
               }),
@@ -189,7 +207,7 @@ export async function POST(request: Request) {
       }
     } else if (!resendKey) {
       console.log('=== FORM EMAIL (no Resend key) ===')
-      console.log('To:', body.emailTo?.join(', '))
+      console.log('To:', recipients.join(', '))
       console.log('Subject:', body.emailSubject)
       console.log(body.fields.map((f) => `${f.label}: ${f.value}`).join('\n'))
       console.log('===================================')

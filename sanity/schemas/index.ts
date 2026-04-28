@@ -28,6 +28,7 @@ import blogSettings from './blogSettings'
 import redirect from './redirect'
 import analyticsEvents from './analyticsEvents'
 import scrollCtaSettings from './scrollCtaSettings'
+import emailSettings from './emailSettings'
 
 // Page Builder Module-Schemas
 import heroModule from './modules/heroModule'
@@ -51,6 +52,7 @@ export const schemaTypes = [
   karrierePage,
   superexpelPage,
   scrollCtaSettings,
+  emailSettings,
   schaedlingsseite,
   stadtseite,
 
