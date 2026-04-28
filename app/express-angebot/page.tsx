@@ -12,11 +12,62 @@ export const metadata: Metadata = {
   description: 'Kostenloses Express-Angebot anfordern – unverbindlich, schnell und transparent. Wir melden uns innerhalb von 24 Stunden.',
 }
 
+const expressFormQuery = `*[_type == "form" && _id == "form-express-angebot"][0] {
+  _id,
+  name,
+  fields[] {
+    label,
+    fieldName,
+    fieldType,
+    required,
+    placeholder,
+    defaultValue,
+    options,
+    halfWidth,
+    validation { minLength, maxLength, pattern, patternMessage },
+    acceptedFileTypes,
+    maxFileSize
+  },
+  emailTo,
+  emailCc,
+  emailBcc,
+  emailSubject,
+  emailReplyToField,
+  autoresponderEnabled,
+  autoresponderEmailField,
+  autoresponderSubject,
+  autoresponderMessage,
+  afterSubmitAction,
+  successMessage,
+  redirectType,
+  redirectPage-> { slug { current } },
+  redirectUrl,
+  trackingEnabled,
+  ga4EventName,
+  ga4EventParams[] { key, value },
+  gadsConversionId,
+  gadsConversionLabel,
+  gadsConversionValue,
+  gadsCurrency,
+  metaPixelEvent,
+  metaPixelCustomEvent,
+  captureUtmParams,
+  honeypotEnabled,
+  rateLimitPerMinute,
+  submitButtonText,
+  submitButtonBgColor,
+  submitButtonTextColor,
+  privacyNote,
+  cssClass
+}`
+
 export default async function ExpressAngebotPage() {
-  const [navigation, footer] = await Promise.all([
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [navigation, footer, form] = await Promise.all([
     client.fetch(navigationQuery),
     client.fetch(footerQuery),
-  ])
+    client.fetch(expressFormQuery),
+  ]) as [any, any, any]
 
   return (
     <PageLayout navigation={navigation} footer={footer}>
@@ -28,7 +79,7 @@ export default async function ExpressAngebotPage() {
           { label: 'Express-Angebot' },
         ]}
       />
-      <ExpressAngebotForm />
+      <ExpressAngebotForm form={form} />
     </PageLayout>
   )
 }
