@@ -59,6 +59,14 @@ const structure = (S: StructureBuilder) =>
             .schemaType('scrollCtaSettings')
             .documentId('scrollCtaSettings')
         ),
+      S.listItem()
+        .title('E-Mail Einstellungen')
+        .icon(() => '📧')
+        .child(
+          S.document()
+            .schemaType('emailSettings')
+            .documentId('emailSettings')
+        ),
       S.divider(),
 
       // ── ASV Seiten ─────────────────────────────────────────
