@@ -1,15 +1,20 @@
 import type { Metadata } from 'next'
 import { client } from '@/sanity/lib/client'
 import { navigationQuery, footerQuery, globalSettingsQuery, ueberUnsPageQuery } from '@/sanity/lib/queries'
+import { buildMetadata } from '@/app/lib/seo'
 import PageLayout from '@/app/components/PageLayout'
 import AsvHero from '@/app/components/asv/AsvHero'
 import AsvCtaBanner from '@/app/components/asv/AsvCtaBanner'
 
 export const revalidate = 60
 
-export const metadata: Metadata = {
-  title: 'Über uns | ASV Pest Control GmbH',
-  description: 'ASV Pest Control GmbH – Seit über 30 Jahren professionelle Schädlingsbekämpfung. IHK-zertifiziert, 20.000+ zufriedene Kunden, 24h Notdienst.',
+export async function generateMetadata(): Promise<Metadata> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const page = await client.fetch(ueberUnsPageQuery) as any
+  return buildMetadata(page, {
+    title: 'Über uns | ASV Pest Control GmbH',
+    description: 'ASV Pest Control GmbH – Seit über 30 Jahren professionelle Schädlingsbekämpfung. IHK-zertifiziert, 20.000+ zufriedene Kunden, 24h Notdienst.',
+  })
 }
 
 const DEFAULT_STATS = [

@@ -3,13 +3,17 @@ import { navigationQuery, footerQuery, globalSettingsQuery, homePageQuery } from
 import type { Metadata } from 'next'
 import PageLayout from './components/PageLayout'
 import AsvHomePage from './components/asv/AsvHomePage'
+import { buildMetadata } from './lib/seo'
 
 export const revalidate = 60
 
-export const metadata: Metadata = {
-  title: 'ASV Pest Control GmbH – Professionelle Schädlingsbekämpfung',
-  description:
-    'ASV Pest Control GmbH – Ihr zuverlässiger Partner für professionelle Schädlingsbekämpfung. Über 30 Jahre Erfahrung, 24h Notdienst. Jetzt kostenloses Express-Angebot anfordern.',
+export async function generateMetadata(): Promise<Metadata> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const page = await client.fetch(homePageQuery) as any
+  return buildMetadata(page, {
+    title: 'ASV Pest Control GmbH – Professionelle Schädlingsbekämpfung',
+    description: 'ASV Pest Control GmbH – Ihr zuverlässiger Partner für professionelle Schädlingsbekämpfung. Über 30 Jahre Erfahrung, 24h Notdienst. Jetzt kostenloses Express-Angebot anfordern.',
+  })
 }
 
 export default async function HomePage() {

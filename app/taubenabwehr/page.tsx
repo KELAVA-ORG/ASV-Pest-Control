@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { client } from '@/sanity/lib/client'
 import { navigationQuery, footerQuery, globalSettingsQuery, taubenabwehrPageQuery } from '@/sanity/lib/queries'
+import { buildMetadata } from '@/app/lib/seo'
 import PageLayout from '@/app/components/PageLayout'
 import AsvHero from '@/app/components/asv/AsvHero'
 import AsvCtaBanner from '@/app/components/asv/AsvCtaBanner'
@@ -8,9 +9,13 @@ import AsvFaq from '@/app/components/asv/AsvFaq'
 
 export const revalidate = 60
 
-export const metadata: Metadata = {
-  title: 'Professionelle Taubenabwehr | ASV Pest Control GmbH',
-  description: 'Dauerhafter Schutz vor Tauben – tierschutzkonform und ästhetisch unauffällig. Spikes, Netze, elektrische Systeme. IHK-zertifiziert, kostenlose Beratung.',
+export async function generateMetadata(): Promise<Metadata> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const page = await client.fetch(taubenabwehrPageQuery) as any
+  return buildMetadata(page, {
+    title: 'Professionelle Taubenabwehr | ASV Pest Control GmbH',
+    description: 'Dauerhafter Schutz vor Tauben – tierschutzkonform und ästhetisch unauffällig. Spikes, Netze, elektrische Systeme. IHK-zertifiziert, kostenlose Beratung.',
+  })
 }
 
 const DEFAULT_FAQS = [

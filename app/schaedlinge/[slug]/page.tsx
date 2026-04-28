@@ -34,10 +34,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const page = await client.fetch(schaedlingsseiteQuery, { slug })
   if (!page) return {}
-  return {
+  const meta: Metadata = {
     title: page.seoTitle || `${page.title} | ASV Pest Control GmbH`,
-    description: page.seoDescription || '',
+    description: page.seoDescription || undefined,
   }
+  if (page.seoImage?.asset?.url) {
+    meta.openGraph = { images: [{ url: page.seoImage.asset.url }] }
+  }
+  if (page.noIndex) {
+    meta.robots = { index: false, follow: true }
+  }
+  return meta
 }
 
 export default async function SchaedlingsPage({ params }: Props) {

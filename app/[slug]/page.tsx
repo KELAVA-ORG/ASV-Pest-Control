@@ -259,11 +259,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const stadtseite = await client.fetch(stadtseiteQuery, { slug })
   if (stadtseite) {
-    return {
+    const m: Metadata = {
       title: stadtseite.seoTitle || `Kammerjäger ${stadtseite.cityName} | ASV Pest Control GmbH`,
       description: stadtseite.seoDescription || '',
     }
+    if (stadtseite.noIndex) m.robots = { index: false, follow: true }
+    return m
   }
+
+  // LegalPage SEO
+  const legalPage = await client.fetch(legalPageQuery, { slug })
+  if (legalPage) {
+    const m: Metadata = {
+      title: legalPage.seoTitle || `${legalPage.title} | ASV Pest Control GmbH`,
+      description: legalPage.seoDescription || undefined,
+    }
+    if (legalPage.noIndex) m.robots = { index: false, follow: true }
+    return m
+  }
+
   const page: PageData | null = await client.fetch(pageQuery, { slug })
 
   if (!page) return {}

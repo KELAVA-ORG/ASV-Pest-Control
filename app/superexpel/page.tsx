@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { client } from '@/sanity/lib/client'
 import { navigationQuery, footerQuery, globalSettingsQuery, superexpelPageQuery } from '@/sanity/lib/queries'
+import { buildMetadata } from '@/app/lib/seo'
 import PageLayout from '@/app/components/PageLayout'
 import AsvHero from '@/app/components/asv/AsvHero'
 import AsvCtaBanner from '@/app/components/asv/AsvCtaBanner'
@@ -8,9 +9,13 @@ import AsvFaq from '@/app/components/asv/AsvFaq'
 
 export const revalidate = 60
 
-export const metadata: Metadata = {
-  title: 'Superexpel – Das Nr. 1 Vergrämungsmittel | ASV Pest Control GmbH',
-  description: 'Superexpel – effektives Vergrämungsmittel gegen Marder und Wildtiere auf natürlicher Basis. 20.000+ Anwendungen. Sicher für Mensch und Tier.',
+export async function generateMetadata(): Promise<Metadata> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const page = await client.fetch(superexpelPageQuery) as any
+  return buildMetadata(page, {
+    title: 'Superexpel – Das Nr. 1 Vergrämungsmittel | ASV Pest Control GmbH',
+    description: 'Superexpel – effektives Vergrämungsmittel gegen Marder und Wildtiere auf natürlicher Basis. 20.000+ Anwendungen. Sicher für Mensch und Tier.',
+  })
 }
 
 const DEFAULT_USES = [

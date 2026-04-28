@@ -38,6 +38,8 @@ export const schaedlingsseiteQuery = `*[_type == "schaedlingsseite" && slug.curr
   slug,
   seoTitle,
   seoDescription,
+  seoImage { asset->{ url } },
+  noIndex,
   heroImage { asset-> { url }, alt },
   heroSubtitle,
   introTitle,
@@ -621,12 +623,14 @@ export const allLegalPagesQuery = `*[_type == "legalPage"] {
 export const legalPageQuery = `*[_type == "legalPage" && slug.current == $slug][0] {
   title,
   slug,
-  content[]
+  content[],
+  seoTitle, seoDescription, seoImage { asset->{ url } }, noIndex
 }`
 
 /* ═══ ASV SEITEN ═══ */
 
 export const homePageQuery = `*[_type == "homePage"][0] {
+  seoTitle, seoDescription, seoImage { asset->{ url } }, noIndex,
   heroTitle,
   heroSubtitle,
   heroImage { asset->{ url }, alt },
@@ -644,6 +648,7 @@ export const homePageQuery = `*[_type == "homePage"][0] {
 }`
 
 export const taubenabwehrPageQuery = `*[_type == "taubenabwehrPage"][0] {
+  seoTitle, seoDescription, seoImage { asset->{ url } }, noIndex,
   heroImage { asset->{ url }, alt },
   heroSubtitle,
   introTitle,
@@ -662,6 +667,7 @@ export const taubenabwehrPageQuery = `*[_type == "taubenabwehrPage"][0] {
 }`
 
 export const ueberUnsPageQuery = `*[_type == "ueberUnsPage"][0] {
+  seoTitle, seoDescription, seoImage { asset->{ url } }, noIndex,
   heroSubtitle,
   storyTitle,
   storyText,
@@ -675,6 +681,7 @@ export const ueberUnsPageQuery = `*[_type == "ueberUnsPage"][0] {
 }`
 
 export const standortePageQuery = `*[_type == "standortePage"][0] {
+  seoTitle, seoDescription, seoImage { asset->{ url } }, noIndex,
   heroSubtitle,
   introText,
   locations[] { name, address, phone, phoneTel, description, hours },
@@ -685,6 +692,7 @@ export const standortePageQuery = `*[_type == "standortePage"][0] {
 }`
 
 export const karrierePageQuery = `*[_type == "karrierePage"][0] {
+  seoTitle, seoDescription, seoImage { asset->{ url } }, noIndex,
   heroSubtitle,
   introTitle,
   introText,
@@ -699,6 +707,7 @@ export const karrierePageQuery = `*[_type == "karrierePage"][0] {
 }`
 
 export const superexpelPageQuery = `*[_type == "superexpelPage"][0] {
+  seoTitle, seoDescription, seoImage { asset->{ url } }, noIndex,
   heroSubtitle,
   introTitle,
   introText,

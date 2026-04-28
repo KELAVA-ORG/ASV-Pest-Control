@@ -1,15 +1,20 @@
 import type { Metadata } from 'next'
 import { client } from '@/sanity/lib/client'
 import { navigationQuery, footerQuery, globalSettingsQuery, karrierePageQuery } from '@/sanity/lib/queries'
+import { buildMetadata } from '@/app/lib/seo'
 import PageLayout from '@/app/components/PageLayout'
 import AsvHero from '@/app/components/asv/AsvHero'
 import AsvCtaBanner from '@/app/components/asv/AsvCtaBanner'
 
 export const revalidate = 60
 
-export const metadata: Metadata = {
-  title: 'Karriere | ASV Pest Control GmbH',
-  description: 'Werden Sie Teil unseres Teams! Wir suchen Schädlingsbekämpfer, Servicetechniker und Auszubildende. Faire Bezahlung, Weiterbildung, Firmenwagen.',
+export async function generateMetadata(): Promise<Metadata> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const page = await client.fetch(karrierePageQuery) as any
+  return buildMetadata(page, {
+    title: 'Karriere | ASV Pest Control GmbH',
+    description: 'Werden Sie Teil unseres Teams! Wir suchen Schädlingsbekämpfer, Servicetechniker und Auszubildende. Faire Bezahlung, Weiterbildung, Firmenwagen.',
+  })
 }
 
 const DEFAULT_BENEFITS = [

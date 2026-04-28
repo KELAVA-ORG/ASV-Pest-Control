@@ -1,15 +1,20 @@
 import type { Metadata } from 'next'
 import { client } from '@/sanity/lib/client'
 import { navigationQuery, footerQuery, globalSettingsQuery, standortePageQuery } from '@/sanity/lib/queries'
+import { buildMetadata } from '@/app/lib/seo'
 import PageLayout from '@/app/components/PageLayout'
 import AsvHero from '@/app/components/asv/AsvHero'
 import AsvCtaBanner from '@/app/components/asv/AsvCtaBanner'
 
 export const revalidate = 60
 
-export const metadata: Metadata = {
-  title: 'Unsere Standorte | ASV Pest Control GmbH',
-  description: '13 Standorte in der Region – immer ein Kammerjäger in Ihrer Nähe. 24h Notdienst, kostenlose Erstberatung.',
+export async function generateMetadata(): Promise<Metadata> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const page = await client.fetch(standortePageQuery) as any
+  return buildMetadata(page, {
+    title: 'Unsere Standorte | ASV Pest Control GmbH',
+    description: '13 Standorte in der Region – immer ein Kammerjäger in Ihrer Nähe. 24h Notdienst, kostenlose Erstberatung.',
+  })
 }
 
 const DEFAULT_STANDORTE = [
