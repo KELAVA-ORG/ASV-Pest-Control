@@ -87,7 +87,20 @@ const BENEFITS = [
   { icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>, title: 'Garantie auf Leistung', text: 'Wir stehen für den Erfolg unserer Arbeit ein – mit Nachkontrolle und Zufriedenheitsgarantie.' },
 ]
 
-const CITIES = ['Frankfurt', 'Wiesbaden', 'Mainz', 'Darmstadt', 'Offenbach', 'Hanau', 'Bad Homburg', 'Friedberg', 'Gießen', 'Aschaffenburg', 'Rüsselsheim', 'Oberursel']
+const CITIES = [
+  { name: 'Frankfurt', slug: 'frankfurt' },
+  { name: 'Wiesbaden', slug: 'wiesbaden' },
+  { name: 'Mainz', slug: 'mainz' },
+  { name: 'Darmstadt', slug: null },
+  { name: 'Offenbach', slug: 'offenbach' },
+  { name: 'Hanau', slug: 'hanau' },
+  { name: 'Bad Homburg', slug: 'bad-homburg' },
+  { name: 'Friedberg', slug: null },
+  { name: 'Gießen', slug: null },
+  { name: 'Aschaffenburg', slug: 'aschaffenburg' },
+  { name: 'Rüsselsheim', slug: null },
+  { name: 'Oberursel', slug: null },
+]
 
 const TESTIMONIALS = [
   { text: 'Schnelle und professionelle Hilfe bei unserem Wespenproblem. Das Team war innerhalb weniger Stunden vor Ort und hat das Nest sicher entfernt. Sehr empfehlenswert!', author: 'Thomas M.', location: 'Frankfurt am Main' },
@@ -344,7 +357,9 @@ export default function AsvHomePage({ settings, homePage }: Props) {
           <div className="region" data-animate="fade-up" data-animate-delay="100">
             <div className="region__cities">
               {CITIES.map((city, i) => (
-                <span key={i} className="region__city">{city}</span>
+                city.slug
+                  ? <Link key={i} href={`/${city.slug}`} className="region__city region__city--link">{city.name}</Link>
+                  : <span key={i} className="region__city">{city.name}</span>
               ))}
             </div>
           </div>

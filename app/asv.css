@@ -1685,6 +1685,19 @@ p:last-child {
   color: var(--brand-red);
 }
 
+.region__city--link {
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+  color: var(--gray-700);
+}
+
+.region__city--link:hover {
+  background-color: var(--brand-red);
+  border-color: var(--brand-red);
+  color: #fff;
+}
+
 /* ==========================================================================
    16. SIGN CARDS (PEST SUBPAGE)
    ========================================================================== */
