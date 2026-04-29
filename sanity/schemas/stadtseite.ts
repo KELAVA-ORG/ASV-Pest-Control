@@ -115,6 +115,17 @@ export default defineType({
 
     /* ─── HERO ─── */
     defineField({
+      name: 'heroImage',
+      title: 'Hero-Hintergrundbild',
+      type: 'image',
+      options: { hotspot: true },
+      description: 'Hintergrundbild des Hero-Bereichs. Wenn leer, wird das Standard-Bild verwendet.',
+      fields: [
+        defineField({ name: 'alt', title: 'Alt-Text', type: 'string' }),
+      ],
+      group: 'content',
+    }),
+    defineField({
       name: 'heroSubtitle',
       title: 'Hero-Untertitel',
       type: 'text',

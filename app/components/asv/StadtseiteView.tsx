@@ -20,6 +20,7 @@ interface Stadtseite {
   address?: Address
   geo?: Geo
   plzExample?: string
+  heroImage?: { asset?: { url: string }; alt?: string }
   heroSubtitle?: string
   cityDescription?: string
   districts?: string[]
@@ -139,6 +140,7 @@ export default function StadtseiteView({ city, settings }: Props) {
       <AsvHero
         title={`Schädlingsbekämpfung ${city.cityShort} – Schnell & Diskret`}
         subtitle={city.heroSubtitle || `Ihr Kammerjäger in ${city.cityName} – schnell, diskret, IHK-zertifiziert.`}
+        heroImageUrl={city.heroImage?.asset?.url || '/images/kammerjaeger-desinfektion-kueche-scaled.webp'}
         phoneFormatted={phone}
         phoneTel={phoneTel}
         ctaText="Kostenlose Beratung anfordern"

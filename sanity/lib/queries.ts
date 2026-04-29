@@ -76,6 +76,7 @@ export const stadtseiteQuery = `*[_type == "stadtseite" && slug.current == $slug
   address { street, zip, city },
   geo { lat, lng },
   plzExample,
+  heroImage { asset->{ url }, alt },
   heroSubtitle,
   cityDescription,
   districts,
